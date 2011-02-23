@@ -2,9 +2,28 @@
 namespace cB\gData\Calendar;
 use cB\Common\TypeCast, cB\gData\Auth;
 
+use DateTime;
+
+/**
+ * Thinking of saving a type of serialized entry of this
+ * use wakeup/sleep to avoid another connection
+ * This way Catalog can give data to Calendar w/o making another req
+ * 
+ */
+
 class Calendar {
-    public function __construct(Auth\Adapter $adapter, TypeCast\URL $url_src) {
-        
+    protected $adapter;
+
+    public function __construct(TypeCast\URL $url_src, Auth\Adapter $adapter = null) {
+        if (is_null($adapter)) {
+            $adapter = new Auth\Anonymous();
+        }
+        $this->adapter = $adapter;
+    }
+
+    // From: Now
+    // To: End of Time!
+    public function getEvents(DateTime $from = null, DateTime $to = null) {
     }
 }
 ?>

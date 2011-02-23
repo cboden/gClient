@@ -1,6 +1,7 @@
 <?php
 namespace cB\gData\Calendar;
 use cB\Common, cB\Common\TypeCast, cB\gData\Auth;
+use SplDoublyLinkedList, Closure;
 
 const ALL_LIST_URL   = 'https://www.google.com/calendar/feeds/default/allcalendars/full';
 const OWNER_LIST_URL = 'https://www.google.com/calendar/feeds/default/owncalendars/full';
@@ -8,7 +9,9 @@ const OWNER_LIST_URL = 'https://www.google.com/calendar/feeds/default/owncalenda
 // maybe to list generation on construct
 // iteratable/countable instance
 // Catalog, Listing, Library, Directory
-// Manager, Cabnet, ???
+// Manager, Cabnet, Composite, ???
+
+// new SplPriorityQueue
 
 class Catalog {
     protected $clendars = Array();
@@ -24,6 +27,11 @@ class Catalog {
         $this->calendars = $response['feed']['entry'];
     }
 
+    public function each(Closure $fn) {
+        array_map($fn, $this->calendars);
+        return $this;
+    }
+
     /**
      * @deprecated soon
      */
@@ -37,6 +45,12 @@ class Catalog {
         }
 
         return $return;
+    }
+
+    public function createCalendar($name) {
+    }
+
+    public function deleteCalendar() {
     }
 }
 ?>

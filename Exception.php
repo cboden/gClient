@@ -1,5 +1,6 @@
 <?php
 namespace cB\gData;
+use Exception as E;
 
-class Exception extends \Exception {}
+class Exception extends E {}
 ?>
