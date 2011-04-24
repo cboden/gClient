@@ -14,7 +14,7 @@ use DateTime;
 class Calendar {
     protected $adapter;
 
-    public function __construct(TypeCast\URL $url_src, Auth\Adapter $adapter = null) {
+    public function __construct($url_src, Auth\Adapter $adapter = null) {
         if (is_null($adapter)) {
             $adapter = new Auth\Anonymous();
         }

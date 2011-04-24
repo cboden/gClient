@@ -23,7 +23,7 @@ class Catalog {
     public function __construct(Auth\Adapter $adapter, $only_owner = false) {
         $this->adapter = $adapter;
 
-        $response = $this->adapter->request(new TypeCast\URL((boolean)$only_owner ? OWNER_LIST_URL : ALL_LIST_URL), 'GET');
+        $response = $this->adapter->request((boolean)$only_owner ? OWNER_LIST_URL : ALL_LIST_URL, 'GET');
         $this->calendars = $response['feed']['entry'];
     }
 

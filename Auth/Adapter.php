@@ -1,6 +1,6 @@
 <?php
 namespace cB\gData\Auth;
-use cB\Common, cB\Common\TypeCast, cB\gData;
+use cB\gData;
 
 const PROTOCOL_VERSION = 'GData-Version: 2.0';
 const BASE_URL         = 'https://www.google.com/';
@@ -11,9 +11,16 @@ interface Authenticator {
 
 abstract class Adapter implements Authenticator {
     protected $token;
+    protected $req_class;
+
+    protected static $def_req_class = 'cB\gData\Requester\cURL';
+
+    public function __construct() {
+        $this->req_class = static::$def_req_class;
+    }
 
     public function __sleep() {
-        return Array('token');
+        return Array('token', 'req_class');
     }
 
     public function __wakeup() {
@@ -22,18 +29,31 @@ abstract class Adapter implements Authenticator {
         // throw special exception if not, so reconnect with ClientLogin (or whatever)
     }
 
-    public function request(TypeCast\URL $url, $method, Array $data = Array(), Array $headers = Array()) {
-        $conn = new Common\cURL(
-            $url
-          , $method
-          , Array('alt' => 'json')
-          , Array(sprintf(static::getHeaderString(), $this->token), PROTOCOL_VERSION)
-        );
+    /**
+     * @param {String} $requester_class Classname of Client HTTP caller - must be instance of Requester
+     */
+    public function setRequester($requester_class) {
+        if (!class_exists($requester_class)) {
+            throw new Exception("{$requester_class} does not exist");
+        }
 
-        $body = $conn->getResponse();
-        return json_decode($body, true);
+        $test = new $requester_class();
+        if (!is_a($test, 'cB\gData\Requester')) {
+            throw new Exception('Requester class must be instance of Requester');
+        }
+
+        $this->req_class = $requester_class;
+    }
+
+    protected function reqFactory($url) {
+        $class = $this->req_class;
+        return new $class($url);
+    }
+
+    public function request($url, $method, Array $data = Array(), Array $headers = Array()) {
+        $res = $this->reqFactory($url, $method)->addParameters($data)->addHeaders($headers)->request();
+
+        return json_decode($res->getResponse(), true);
     }
 }
-
-class InvalidCredentialsException extends gData\Exception {}
 ?>
