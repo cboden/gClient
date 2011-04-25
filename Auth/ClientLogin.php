@@ -13,7 +13,7 @@ class ClientLogin extends Adapter {
 
         $req = $this->reqFactory(CL\URL)
             ->method('POST')
-            ->addParameters(Array(
+            ->setParameters(Array(
                 'Email'       => $username
               , 'accountType' => 'HOSTED_OR_GOOGLE'
               , 'Passwd'      => $password

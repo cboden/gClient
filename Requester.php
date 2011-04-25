@@ -19,7 +19,7 @@ interface Requester {
      * @param {String} $val
      * @returns {Object} $this For chaining responses
      */
-    public function addParameter($key, $val);
+    public function setParameter($key, $val);
 
     /**
      * @param {String} $header Add a header to the HTTP request
@@ -28,10 +28,10 @@ interface Requester {
     public function addHeader($header);
 
     /**
-     * @param {Array} $parameters An associative array with key/val parings to be sent to addParameter()
+     * @param {Array} $parameters An associative array with key/val parings to be sent to setParameter()
      * @returns {Object} $this For chaining responses
      */
-    public function addParameters(Array $parameters = Array());
+    public function setParameters(Array $parameters = Array());
 
     /**
      * @param {Array} $headers Headers to be added to the request

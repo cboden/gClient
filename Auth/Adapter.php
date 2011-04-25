@@ -53,8 +53,8 @@ abstract class Adapter implements Authenticator {
     public function request($url, $method, Array $data = Array(), Array $headers = Array()) {
         $res = $this->reqFactory($url)
             ->method($method)
-            ->addParameter('alt', 'json')
-            ->addParameters($data)
+            ->setParameter('alt', 'json')
+            ->setParameters($data)
             ->addHeader(sprintf(static::getHeaderString(), $this->token))
             ->addHeader(PROTOCOL_VERSION)
             ->addHeaders($headers)

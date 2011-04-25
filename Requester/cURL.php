@@ -36,7 +36,7 @@ class cURL implements ReqI {
         return $this;
     }
 
-    public function addParameter($key, $val) {
+    public function setParameter($key, $val) {
         $this->params[$key] = $val;
         return $this;
     }
@@ -46,9 +46,9 @@ class cURL implements ReqI {
         return $this;
     }
 
-    public function addParameters(Array $parameters = Array()) {
+    public function setParameters(Array $parameters = Array()) {
         foreach ($parameters as $key => $val) {
-            $this->addParameter($key, $val);
+            $this->setParameter($key, $val);
         }
 
         return $this;
