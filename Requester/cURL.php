@@ -48,7 +48,7 @@ class cURL implements ReqI {
 
     public function addParameters(Array $parameters = Array()) {
         foreach ($parameters as $key => $val) {
-            $this->addHeader($key, $val);
+            $this->addParameter($key, $val);
         }
 
         return $this;
