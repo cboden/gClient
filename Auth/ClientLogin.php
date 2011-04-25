@@ -9,6 +9,8 @@ use cB\gData\Auth\ClientLogin as CL;
 
 class ClientLogin extends Adapter {
     public function __construct($username, $password, $client) {
+        parent::__construct();
+
         $req = $this->reqFactory(CL\URL)
             ->method('POST')
             ->addParameters(Array(
@@ -19,6 +21,7 @@ class ClientLogin extends Adapter {
               , 'service'     => CL\SERVICE
             ))
             ->addHeader(PROTOCOL_VERSION)
+            ->request()
         ;
 
         $body = $req->getResponse();

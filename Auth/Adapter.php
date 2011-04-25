@@ -13,7 +13,7 @@ abstract class Adapter implements Authenticator {
     protected $token;
     protected $req_class;
 
-    protected static $def_req_class = 'cB\gData\Requester\cURL';
+    protected static $def_req_class = '\cB\gData\Requester\cURL';
 
     public function __construct() {
         $this->req_class = static::$def_req_class;
@@ -38,7 +38,7 @@ abstract class Adapter implements Authenticator {
         }
 
         $test = new $requester_class();
-        if (!is_a($test, 'cB\gData\Requester')) {
+        if (!($test instanceof \cB\gData\Requester)) {
             throw new Exception('Requester class must be instance of Requester');
         }
 

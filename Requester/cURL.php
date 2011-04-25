@@ -32,6 +32,8 @@ class cURL implements ReqI {
             throw new Exception("Invalid method {$method}");
         }
         $this->method = $method;
+
+        return $this;
     }
 
     public function addParameter($key, $val) {
@@ -98,7 +100,7 @@ class cURLResponse implements ResI {
             throw new cURLException(curl_error($req), curl_errno($req));
         }
 
-        $this->xfer_info = curl_getinfo($this->ch);
+        $this->xfer_info = curl_getinfo($req);
 
         $this->header   = substr($response, 0, $this->xfer_info['header_size']);
         $this->response = trim(substr($response, $this->xfer_info['header_size']));
