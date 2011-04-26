@@ -6,4 +6,3 @@ class Anonymous extends Adapter {
         return '';
     }
 }
-?>

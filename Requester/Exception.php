@@ -1,5 +1,5 @@
 <?php
 namespace cB\gData\Requester;
-use cB\gData;
+use cB\gData\Exception as gE;
 
-class Exception extends gData\Exception {}
+class Exception extends gE {}

@@ -1,6 +1,5 @@
 <?php
 namespace cB\gData\Auth;
-use cB\gData;
+use cB\gData\Exception as gE;
 
-class InvalidTokenException extends gData\Exception {}
-?>
+class InvalidTokenException extends gE {}

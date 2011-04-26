@@ -21,8 +21,7 @@ class ClientLogin extends Adapter {
               , 'service'     => CL\SERVICE
             ))
             ->addHeader(PROTOCOL_VERSION)
-            ->request()
-        ;
+        ->request();
 
         $body = $req->getResponse();
 
@@ -39,4 +38,3 @@ class ClientLogin extends Adapter {
         return 'Authorization: GoogleLogin auth=%s';
     }
 }
-?>

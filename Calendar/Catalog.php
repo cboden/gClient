@@ -28,7 +28,7 @@ class Catalog {
     }
 
     public function each(Closure $fn) {
-        array_map($fn, $this->calendars);
+        array_walk($this->calendars, $fn);
         return $this;
     }
 
@@ -53,4 +53,3 @@ class Catalog {
     public function deleteCalendar() {
     }
 }
-?>

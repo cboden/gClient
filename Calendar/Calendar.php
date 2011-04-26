@@ -26,4 +26,3 @@ class Calendar {
     public function getEvents(DateTime $from = null, DateTime $to = null) {
     }
 }
-?>

@@ -63,4 +63,3 @@ abstract class Adapter implements Authenticator {
         return json_decode($res->getResponse(), true);
     }
 }
-?>
