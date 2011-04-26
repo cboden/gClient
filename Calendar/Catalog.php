@@ -1,6 +1,6 @@
 <?php
 namespace cB\gData\Calendar;
-use cB\Common, cB\Common\TypeCast, cB\gData\Auth;
+use cB\gData\Auth\Adapter;
 use SplDoublyLinkedList, Closure;
 
 const ALL_LIST_URL   = 'https://www.google.com/calendar/feeds/default/allcalendars/full';
@@ -20,7 +20,7 @@ class Catalog {
     protected $adapter;
     protected $only_owner = false;
 
-    public function __construct(Auth\Adapter $adapter, $only_owner = false) {
+    public function __construct(Adapter $adapter, $only_owner = false) {
         $this->adapter = $adapter;
 
         $response = $this->adapter->request((boolean)$only_owner ? OWNER_LIST_URL : ALL_LIST_URL, 'GET');

@@ -1,6 +1,6 @@
 <?php
 namespace cB\gData\Calendar;
-use cB\Common\TypeCast, cB\gData\Auth;
+use cB\gData\Auth\Adapter;
 
 use DateTime;
 
@@ -14,7 +14,7 @@ use DateTime;
 class Calendar {
     protected $adapter;
 
-    public function __construct($url_src, Auth\Adapter $adapter = null) {
+    public function __construct($url_src, Adapter $adapter = null) {
         if (is_null($adapter)) {
             $adapter = new Auth\Anonymous();
         }
