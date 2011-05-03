@@ -1,5 +1,5 @@
 <?php
-namespace cB\gData;
+namespace cB\gClient;
 use Exception as E;
 
 class Exception extends E {}

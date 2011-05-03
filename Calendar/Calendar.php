@@ -1,6 +1,6 @@
 <?php
-namespace cB\gData\Calendar;
-use cB\gData\Auth\Adapter;
+namespace cB\gClient\Calendar;
+use cB\gClient\Auth\Adapter;
 
 use DateTime;
 

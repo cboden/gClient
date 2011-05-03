@@ -1,7 +1,7 @@
 <?php
-namespace cB\gData\Requester;
-use cB\gData\Requester as ReqI;
-use cB\gData\Response  as ResI;
+namespace cB\gClient\Requester;
+use cB\gClient\Requester as ReqI;
+use cB\gClient\Response  as ResI;
 
 class cURL implements ReqI {
     protected static $default_opts = Array(

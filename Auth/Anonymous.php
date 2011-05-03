@@ -1,5 +1,5 @@
 <?php
-namespace cB\gData\Auth;
+namespace cB\gClient\Auth;
 
 class Anonymous extends Adapter {
     public function getHeaderString() {
