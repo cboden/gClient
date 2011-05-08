@@ -1,6 +1,6 @@
 <?php
-namespace cB\gClient\Auth;
-use cB\gClient;
+namespace gClient\Auth;
+use gClient;
 
 const PROTOCOL_VERSION = 'gClient-Version: 2.0';
 const BASE_URL         = 'https://www.google.com/';
@@ -13,7 +13,7 @@ abstract class Adapter implements Authenticator {
     protected $token;
     protected $req_class;
 
-    protected static $def_req_class = '\cB\gClient\Requester\cURL';
+    protected static $def_req_class = '\gClient\Requester\cURL';
 
     public function __construct() {
         $this->req_class = static::$def_req_class;
@@ -38,7 +38,7 @@ abstract class Adapter implements Authenticator {
         }
 
         $test = new $requester_class();
-        if (!($test instanceof \cB\gClient\Requester)) {
+        if (!($test instanceof \gClient\Requester)) {
             throw new Exception('Requester class must be instance of Requester');
         }
 

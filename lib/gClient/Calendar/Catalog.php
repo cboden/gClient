@@ -1,6 +1,6 @@
 <?php
-namespace cB\gClient\Calendar;
-use cB\gClient\Auth\Adapter;
+namespace gClient\Calendar;
+use gClient\Auth\Adapter;
 use SplDoublyLinkedList, Closure;
 
 const ALL_LIST_URL   = 'https://www.google.com/calendar/feeds/default/allcalendars/full';

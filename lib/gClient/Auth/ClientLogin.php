@@ -1,11 +1,11 @@
 <?php
-namespace cB\gClient\Auth\ClientLogin;
+namespace gClient\Auth\ClientLogin;
 
 const URL     = 'https://www.google.com/accounts/ClientLogin';
 const SERVICE = 'cl'; // CL stands for Calendar...http://code.google.com/apis/gClient/faq.html#clientlogin -> this needs to be changed to be injected
 
-namespace cB\gClient\Auth;
-use cB\gClient\Auth\ClientLogin as CL;
+namespace gClient\Auth;
+use gClient\Auth\ClientLogin as CL;
 
 class ClientLogin extends Adapter {
     public function __construct($username, $password, $client) {

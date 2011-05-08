@@ -1,5 +1,5 @@
 <?php
-namespace cB\gClient;
+namespace gClient;
 
 interface Requester {
     /**
