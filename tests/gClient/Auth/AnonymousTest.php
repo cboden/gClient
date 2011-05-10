@@ -1,5 +1,5 @@
 <?php
-namespace gClientTests\HTTP\cURL;
+namespace gClientTests\Auth;
 use gClient\Auth;
 
 class AnonymousTest extends \PHPUnit_Framework_TestCase {

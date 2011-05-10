@@ -42,10 +42,10 @@ abstract class Adapter implements Authenticator {
      * Default requestor class
      * @var string
      */
-    protected static $def_req_class = '\gClient\HTTP\cURL\Client';
+    const DEFAULT_CLIENT_CLASS = '\gClient\HTTP\cURL\Client';
 
     public function __construct() {
-        $this->req_class = static::$def_req_class;
+        $this->req_class = static::DEFAULT_CLIENT_CLASS;
     }
 
     public function __sleep() {
