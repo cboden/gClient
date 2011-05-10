@@ -14,18 +14,11 @@ const PROTOCOL_VERSION = 'gClient-Version: 2.0';
  */
 const BASE_URL         = 'https://www.google.com/';
 
-interface Authenticator {
-    /**
-     * @returns string
-     */
-    public function getHeaderString();
-}
-
 /**
  * Base Google Authentication class.  All methods of authenticating
  * to Google should extend this class
  */
-abstract class Adapter implements Authenticator {
+abstract class Adapter implements AuthenticatorInterface {
     /**
      * Authentication token received from Google
      * @var string
