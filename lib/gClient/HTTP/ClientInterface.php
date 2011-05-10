@@ -1,7 +1,7 @@
 <?php
-namespace gClient;
+namespace gClient\HTTP;
 
-interface Requester {
+interface ClientInterface {
     /**
      * @param string $url Valid URL to call
      * @returns $this
@@ -41,29 +41,7 @@ interface Requester {
 
     /**
      * Make the HTTP request
-     * @returns Response
+     * @returns ResponseInterface
      */
     public function request();
-}
-
-interface Response {
-    /**
-     * @param mixed $response Response from Requester
-     */
-    public function __construct($response);
-
-    /**
-     * @returns int 3 digit HTTP status code
-     */
-    public function getStatusCode();
-
-    /**
-     * @returns string Header lines from request
-     */
-    public function getHeader();
-
-    /**
-     * @returns string Body of HTTP request reesponse
-     */
-    public function getResponse();
 }

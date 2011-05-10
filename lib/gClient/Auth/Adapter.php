@@ -42,7 +42,7 @@ abstract class Adapter implements Authenticator {
      * Default requestor class
      * @var string
      */
-    protected static $def_req_class = '\gClient\Requester\cURL';
+    protected static $def_req_class = '\gClient\HTTP\cURL\Client';
 
     public function __construct() {
         $this->req_class = static::$def_req_class;
@@ -67,8 +67,8 @@ abstract class Adapter implements Authenticator {
         }
 
         $test = new $requester_class();
-        if (!($test instanceof \gClient\Requester)) {
-            throw new Exception('Requester class must be instance of Requester');
+        if (!($test instanceof \gClient\HTTP\Client)) {
+            throw new Exception('Requester class must be instance of HTTP\\Client');
         }
 
         $this->req_class = $requester_class;
