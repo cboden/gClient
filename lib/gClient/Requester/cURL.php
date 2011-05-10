@@ -17,6 +17,10 @@ class cURL implements ReqI {
 
     protected $method  =  'GET';
 
+    /**
+     * @param string $url Valid URL to call
+     * @returns $this
+     */
     public function __construct($url) {
         if (!(boolean)filter_var($url, FILTER_VALIDATE_URL)) {
             throw new \InvalidArgumentException("{$url} is not a valid URL");
@@ -26,6 +30,10 @@ class cURL implements ReqI {
         $this->opts[CURLOPT_URL] = $url;
     }
 
+    /**
+     * @param string $header Method to call
+     * @returns $this
+     */
     public function method($method) {
         $method = strtoupper((string)$method);
         if (!in_array($method, Array('GET', 'POST', 'PUT', 'DELETE'))) {
@@ -36,16 +44,29 @@ class cURL implements ReqI {
         return $this;
     }
 
+    /**
+     * @param string $key
+     * @param string $val
+     * @returns $this
+     */
     public function setParameter($key, $val) {
         $this->params[$key] = $val;
         return $this;
     }
 
+    /**
+     * @param string $header Add a header to the HTTP request
+     * @returns $this
+     */
     public function addHeader($header) {
         $this->headers[] = $header;
         return $this;
     }
 
+    /**
+     * @param Array $parameters An associative array with key/val parings to be sent to setParameter()
+     * @returns $this
+     */
     public function setParameters(Array $parameters = Array()) {
         foreach ($parameters as $key => $val) {
             $this->setParameter($key, $val);
@@ -54,11 +75,19 @@ class cURL implements ReqI {
         return $this;
     }
 
+    /**
+     * @param Array $headers Headers to be added to the request
+     * @returns $this
+     */
     public function addHeaders(Array $headers = Array()) {
         $this->headers += $headers;
         return $this;
     }
 
+    /**
+     * Make the HTTP request
+     * @returns cURLResponse
+     */
     public function request() {
         $this->opts[CURLOPT_HTTPHEADER] = $this->headers;
 
@@ -95,6 +124,9 @@ class cURLResponse implements ResI {
     protected $header;
     protected $response;
 
+    /**
+     * @param mixed $response Response from Requester
+     */
     public function __construct($req) {
         if (false === ($response = curl_exec($req))) {
             throw new cURLException(curl_error($req), curl_errno($req));
@@ -108,14 +140,23 @@ class cURLResponse implements ResI {
         curl_close($req);
     }
 
+    /**
+     * @returns int 3 digit HTTP status code
+     */
     public function getStatusCode() {
         return $this->xfer_info['http_code'];
     }
 
+    /**
+     * @returns string Header lines from request
+     */
     public function getHeader() {
         return $this->header;
     }
 
+    /**
+     * @returns string Body of HTTP request reesponse
+     */
     public function getResponse() {
         return $this->response;
     }

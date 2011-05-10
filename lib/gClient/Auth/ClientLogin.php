@@ -1,13 +1,33 @@
 <?php
 namespace gClient\Auth\ClientLogin;
 
+/**
+ * The URL defining the ClientLogin protocol
+ * @var string
+ */
 const URL     = 'https://www.google.com/accounts/ClientLogin';
-const SERVICE = 'cl'; // CL stands for Calendar...http://code.google.com/apis/gClient/faq.html#clientlogin -> this needs to be changed to be injected
+
+/**
+ * CL stands for Calendar...http://code.google.com/apis/gClient/faq.html#clientlogin
+ * @note this needs to be changed to be injected
+ * @var string
+ */
+const SERVICE = 'cl';
 
 namespace gClient\Auth;
 use gClient\Auth\ClientLogin as CL;
 
+/**
+ * This Authentication class allows the developer to connect
+ * to the Google API with a standard username/password combination
+ */
 class ClientLogin extends Adapter {
+    /**
+     * @param string $username
+     * @param string $password
+     * @param string $client
+     * @throws Exception
+     */
     public function __construct($username, $password, $client) {
         parent::__construct();
 
@@ -34,6 +54,10 @@ class ClientLogin extends Adapter {
         }
     }
 
+    /**
+     * Used by the parent Adapter class to pass authentication token
+     * @returns string
+     */
     public function getHeaderString() {
         return 'Authorization: GoogleLogin auth=%s';
     }
