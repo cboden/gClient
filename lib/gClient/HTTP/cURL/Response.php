@@ -5,7 +5,7 @@ use gClient\HTTP\ResponseInterface as RI;
 class Response implements RI {
     protected $xfer_info;
     protected $header;
-    protected $response;
+    protected $content;
 
     /**
      * @param mixed $response Response from Requester
@@ -17,8 +17,8 @@ class Response implements RI {
 
         $this->xfer_info = curl_getinfo($req);
 
-        $this->header   = substr($response, 0, $this->xfer_info['header_size']);
-        $this->response = trim(substr($response, $this->xfer_info['header_size']));
+        $this->header  = substr($response, 0, $this->xfer_info['header_size']);
+        $this->content = trim(substr($response, $this->xfer_info['header_size']));
 
         curl_close($req);
     }
@@ -40,7 +40,7 @@ class Response implements RI {
     /**
      * @returns string Body of HTTP request reesponse
      */
-    public function getResponse() {
-        return $this->response;
+    public function getContent() {
+        return $this->content;
     }
 }

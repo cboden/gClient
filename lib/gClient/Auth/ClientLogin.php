@@ -37,13 +37,11 @@ class ClientLogin extends Adapter {
               , 'source'      => $client
               , 'service'     => static::SERVICE
             ))
-            ->addHeader(PROTOCOL_VERSION)
         ->request();
-
-        $body = $req->getResponse();
 
         if ($req->getStatusCode() == 200) {
             $needle = 'Auth=';
+            $body   = $req->getContent();
             $this->token = trim(substr($body, strpos($body, $needle) + strlen($needle))); // should I do this through a parent fn?
         } else {
             echo $req->getHeader();

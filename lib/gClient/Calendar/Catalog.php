@@ -14,37 +14,22 @@ const OWNER_LIST_URL = 'https://www.google.com/calendar/feeds/default/owncalenda
 // new SplPriorityQueue
 
 class Catalog {
-    protected $clendars = Array();
-    protected $lookup   = Array();
-
     protected $adapter;
-    protected $only_owner = false;
+    protected $data;
 
     public function __construct(Adapter $adapter, $only_owner = false) {
         $this->adapter = $adapter;
 
-        $response = $this->adapter->request((boolean)$only_owner ? OWNER_LIST_URL : ALL_LIST_URL, 'GET');
-        $this->calendars = $response['feed']['entry'];
-    }
-
-    public function each(Closure $fn) {
-        array_walk($this->calendars, $fn);
-        return $this;
+        $response = $this->adapter->reqFactory((boolean)$only_owner ? OWNER_LIST_URL : ALL_LIST_URL)->method('GET')->request();
+        $data = json_decode($response->getContent(), true);
+        $this->data = $data['data'];
     }
 
     /**
      * @deprecated soon
      */
     public function getCalendars() {
-        $return = Array();
-        foreach ($this->calendars as $key => $data) {
-            // ['content']['src'] . . . 
-
-            $lookup[$data['id']['$t']] = $key;
-            $return[$data['title']['$t']] = $data['id']['$t'];
-        }
-
-        return $return;
+        return $this->data['items'];
     }
 
     public function createCalendar($name) {

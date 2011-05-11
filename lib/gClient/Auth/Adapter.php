@@ -1,24 +1,37 @@
 <?php
 namespace gClient\Auth;
-use gClient;
 
 /**
  * Header telling Google what version of their API we're using
  * @var string
  */
-const PROTOCOL_VERSION = 'gClient-Version: 2.0';
+const PROTOCOL_VERSION = 'GData-Version: 2';
 
 /**
  * Base URL of Google
  * @var string
  */
-const BASE_URL         = 'https://www.google.com/';
+const BASE_URL = 'https://www.google.com/';
 
 /**
  * Base Google Authentication class.  All methods of authenticating
  * to Google should extend this class
  */
 abstract class Adapter implements AuthenticatorInterface {
+    /**
+     * Upon __wakeup() being called, if true, verifies with Google
+     *  that the saved token is still valid
+     * The should only be false if the application frequently sleeps
+     * @var boolean
+     */
+    public $verify_token_on_restoration = true;
+
+    /**
+     * Default requestor class
+     * @var string
+     */
+    const DEFAULT_CLIENT_CLASS = '\gClient\HTTP\cURL\Client';
+
     /**
      * Authentication token received from Google
      * @var string
@@ -31,18 +44,12 @@ abstract class Adapter implements AuthenticatorInterface {
      */
     protected $req_class;
 
-    /**
-     * Default requestor class
-     * @var string
-     */
-    const DEFAULT_CLIENT_CLASS = '\gClient\HTTP\cURL\Client';
-
     public function __construct() {
         $this->req_class = static::DEFAULT_CLIENT_CLASS;
     }
 
     public function __sleep() {
-        return Array('token', 'req_class');
+        return Array('token', 'req_class', 'verify_token_on_restoration');
     }
 
     public function __wakeup() {
@@ -71,29 +78,10 @@ abstract class Adapter implements AuthenticatorInterface {
      * @param string $url
      * @returns mixed Instance of previousl set requestor class
      */
-    protected function reqFactory($url) {
-        $class = $this->req_class;
-        return new $class($url);
-    }
+    public function reqFactory($url) {
+        $class  = $this->req_class;
+        $client = new $class($url);
 
-    /**
-     * Make an HTTP request to the Google API
-     * @param string $url Valid URL to call
-     * @param string $method (GET|POST|PUT|DELETE) HTTP method
-     * @param Array $data Associative array of variables
-     * @param Array $headers Additional headers to send
-     * @returns Array
-     */
-    public function request($url, $method, Array $data = Array(), Array $headers = Array()) {
-        $res = $this->reqFactory($url)
-            ->method($method)
-            ->setParameter('alt', 'json')
-            ->setParameters($data)
-            ->addHeader(sprintf(static::getHeaderString(), $this->token))
-            ->addHeader(PROTOCOL_VERSION)
-            ->addHeaders($headers)
-        ->request();
-
-        return json_decode($res->getResponse(), true);
+        return $client->setParameter('alt', 'jsonc')->addHeader(sprintf(static::getHeaderString(), $this->token))->addHeader(PROTOCOL_VERSION);
     }
 }

@@ -20,5 +20,5 @@ interface ResponseInterface {
     /**
      * @returns string Body of HTTP request reesponse
      */
-    public function getResponse();
+    public function getContent();
 }
