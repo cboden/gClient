@@ -3,23 +3,30 @@ namespace gClient\Calendar;
 use gClient\Auth\Adapter;
 use DateTime;
 
-/**
- * @note Thinking of saving a type of serialized entry of this
- *       use wakeup/sleep to avoid another connection
- *       This way Catalog can give data to Calendar w/o making another req
- */
 class Calendar {
     protected $adapter;
+    protected $info;
 
     /**
      * @param string $url_src URL of the Google Calendar to work with
      * @param gClient\Auth\Adapter|NULL $adapter Authenticated account to use or null for an anonymouse (read-only) connection
+     * @todo Change $catalog_data to mixed - URL to fetch, Array if from Catalog
      */
-    public function __construct($url_src, Adapter $adapter = null) {
+    public function __construct(Array $catalog_data, Adapter $adapter = null) {
         if (is_null($adapter)) {
             $adapter = new Auth\Anonymous();
         }
         $this->adapter = $adapter;
+
+        $this->info = $catalog_data;
+    }
+
+    public function __get($var) {
+        return isset($this->info[$var]) ? $this->info[$var] : '';
+    }
+
+    public function __sleep() {
+        return Array('adapter', 'info');
     }
 
     /**

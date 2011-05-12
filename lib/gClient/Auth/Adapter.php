@@ -54,8 +54,10 @@ abstract class Adapter implements AuthenticatorInterface {
 
     public function __wakeup() {
         echo "Saved: {$this->token}\n";
-        // make verification call to Google to determine if Auth Token is still valid
-        // throw special exception if not, so reconnect with ClientLogin (or whatever)
+
+        if ($this->verify_token_on_restoration {
+            // todo
+        }
     }
 
     /**
@@ -82,6 +84,10 @@ abstract class Adapter implements AuthenticatorInterface {
         $class  = $this->req_class;
         $client = new $class($url);
 
-        return $client->setParameter('alt', 'jsonc')->addHeader(sprintf(static::getHeaderString(), $this->token))->addHeader(PROTOCOL_VERSION);
+        return $client
+            ->setParameter('alt', 'jsonc')
+            ->addHeader(sprintf(static::getHeaderString(), $this->token))
+            ->addHeader(PROTOCOL_VERSION)
+        ;
     }
 }
