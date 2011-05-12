@@ -55,7 +55,7 @@ abstract class Adapter implements AuthenticatorInterface {
     public function __wakeup() {
         echo "Saved: {$this->token}\n";
 
-        if ($this->verify_token_on_restoration {
+        if ($this->verify_token_on_restoration) {
             // todo
         }
     }
