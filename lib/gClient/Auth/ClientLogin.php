@@ -10,7 +10,7 @@ class ClientLogin extends Adapter {
      * The URL defining the ClientLogin protocol
      * @var string
      */
-    const URL = 'https://www.google.com/accounts/ClientLogin';
+    const URL = '/accounts/ClientLogin';
 
     /**
      * CL stands for Calendar...http://code.google.com/apis/gClient/faq.html#clientlogin
@@ -28,7 +28,7 @@ class ClientLogin extends Adapter {
     public function __construct($username, $password, $client) {
         parent::__construct();
 
-        $req = $this->reqFactory(static::URL)
+        $req = $this->reqFactory(static::BASE_URL . static::URL)
             ->method('POST')
             ->setParameters(Array(
                 'Email'       => $username

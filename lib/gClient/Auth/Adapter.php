@@ -2,22 +2,27 @@
 namespace gClient\Auth;
 
 /**
+ * @see http://code.google.com/apis/gdata/docs/developers-guide.html
+ * @see http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html
+ */
+
+/**
  * Header telling Google what version of their API we're using
  * @var string
  */
 const PROTOCOL_VERSION = 'GData-Version: 2';
 
 /**
- * Base URL of Google
- * @var string
- */
-const BASE_URL = 'https://www.google.com/';
-
-/**
  * Base Google Authentication class.  All methods of authenticating
  * to Google should extend this class
  */
 abstract class Adapter implements AuthenticatorInterface {
+    /**
+     * Base URL of Google
+     * @var string
+     */
+    const BASE_URL = 'https://www.google.com';
+
     /**
      * Upon __wakeup() being called, if true, verifies with Google
      *  that the saved token is still valid
