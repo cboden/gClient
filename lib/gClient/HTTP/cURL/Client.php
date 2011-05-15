@@ -6,7 +6,7 @@ class Client implements CI {
     protected static $default_opts = Array(
         CURLOPT_HEADER         => true
       , CURLOPT_RETURNTRANSFER => true
-      , CURLOPT_FOLLOWLOCATION => true
+      , CURLOPT_FOLLOWLOCATION => false
       , CURLOPT_USERAGENT      => 'Mozilla/5.0'
     );
     protected $opts = Array();
@@ -40,6 +40,19 @@ class Client implements CI {
         }
         $this->method = $method;
 
+        return $this;
+    }
+
+    /**
+     * @param mixed(array|object|string) Data to be set as client body
+     * @returns $this
+     */
+    public function setRawData($data) {
+        if (is_array($data) || is_object($data)) {
+            $data = json_encode($data);
+        }
+
+        $this->params = (string)$data;
         return $this;
     }
 

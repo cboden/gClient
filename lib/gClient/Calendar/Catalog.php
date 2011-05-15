@@ -27,10 +27,23 @@ class Catalog implements \SeekableIterator, \Countable {
         $this->data = $data['data'];
     }
 
-    public function createCalendar($name) {
+    public function createCalendar($name, Array $attributes = Array()) {
+        $content = json_encode(Array('data' => Array(
+            'title'    => $name
+          , 'details'  => 'description goes here'
+          , 'timeZone' => 'America/Toronto'
+          , 'hidden'   => false
+          , 'color'    => '#2952A3'
+          , 'location' => 'London'
+        )));
+
+        $res = $this->adapter->reqFactory(OWNER_LIST_URL)->method('POST')->setRawData($content)->request();
+
+        // add calendar to list
+        // return new calendar instance
     }
 
-    public function deleteCalendar() {
+    public function deleteCalendar($id) {
     }
 
     public function subscribeToCalendar() {

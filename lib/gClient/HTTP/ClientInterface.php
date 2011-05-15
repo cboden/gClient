@@ -15,6 +15,12 @@ interface ClientInterface {
     public function method($method);
 
     /**
+     * @param mixed(array|object|string) Data to be set as client body
+     * @returns $this
+     */
+    public function setRawData($data);
+
+    /**
      * @param string $key
      * @param string $val
      * @returns $this

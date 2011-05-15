@@ -11,14 +11,23 @@ class Response implements RI {
      * @param mixed $response Response from Requester
      */
     public function __construct($req) {
-        if (false === ($response = curl_exec($req))) {
-            throw new Exception(curl_error($req), curl_errno($req));
-        }
+        $i = 0;
+        do {
+            $i++;
 
-        $this->xfer_info = curl_getinfo($req);
+            if (false === ($response = curl_exec($req))) {
+                throw new Exception(curl_error($req), curl_errno($req));
+            }
 
-        $this->header  = substr($response, 0, $this->xfer_info['header_size']);
-        $this->content = trim(substr($response, $this->xfer_info['header_size']));
+            $this->xfer_info = curl_getinfo($req);
+
+            $this->header  = substr($response, 0, $this->xfer_info['header_size']);
+            $this->content = trim(substr($response, $this->xfer_info['header_size']));
+
+            if (false !== ($loc = $this->getHeaderItem('Location'))) {
+                curl_setopt($req, CURLOPT_URL, $loc);
+            }
+        } while ($i <= 5);
 
         curl_close($req);
     }
@@ -28,6 +37,21 @@ class Response implements RI {
      */
     public function getStatusCode() {
         return $this->xfer_info['http_code'];
+    }
+
+    /**
+     * @param string $key
+     * @returns mixed(string|boolean)
+     */
+    public function getHeaderItem($key) {
+        $needle = "\n{$key}: ";
+        if (false === $start = strpos($this->header, $needle)) {
+            return false;
+        }
+        $start += strlen($needle);
+        $end    = strpos($this->header, "\n", $start);
+
+        return trim(substr($this->header, $start, $end - $start));
     }
 
     /**

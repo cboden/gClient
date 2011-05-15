@@ -86,8 +86,13 @@ abstract class Adapter implements AuthenticatorInterface {
 
         return $client
             ->setParameter('alt', 'jsonc')
+            ->addHeader('Content-Type: application/json')
             ->addHeader(sprintf(static::getHeaderString(), $this->token))
             ->addHeader(PROTOCOL_VERSION)
         ;
+    }
+
+    public function getToken() {
+        return $this->token;
     }
 }
