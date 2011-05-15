@@ -3,8 +3,8 @@ namespace gClient\Calendar;
 use gClient\Auth\Adapter;
 use SplDoublyLinkedList, Closure;
 
-const ALL_LIST_URL   = 'https://www.google.com/calendar/feeds/default/allcalendars/full';
-const OWNER_LIST_URL = 'https://www.google.com/calendar/feeds/default/owncalendars/full';
+const ALL_LIST_URL   = '/calendar/feeds/default/allcalendars/full';
+const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full';
 
 // maybe to list generation on construct
 // Catalog, Listing, Library, Directory
@@ -22,7 +22,7 @@ class Catalog implements \SeekableIterator, \Countable {
     public function __construct(Adapter $adapter, $only_owner = false) {
         $this->adapter = $adapter;
 
-        $response = $this->adapter->reqFactory((boolean)$only_owner ? OWNER_LIST_URL : ALL_LIST_URL)->method('GET')->request();
+        $response = $adapter->reqFactory($adapter::BASE_URL . ((boolean)$only_owner ? OWNER_LIST_URL : ALL_LIST_URL))->method('GET')->request();
         $data = json_decode($response->getContent(), true);
         $this->data = $data['data'];
     }
@@ -37,10 +37,16 @@ class Catalog implements \SeekableIterator, \Countable {
           , 'location' => 'London'
         )));
 
-        $res = $this->adapter->reqFactory(OWNER_LIST_URL)->method('POST')->setRawData($content)->request();
+        $adapter = $this->adapter;
+        $res     = $adapter->reqFactory($adapter::BASE_URL . OWNER_LIST_URL)->method('POST')->setRawData($content)->request();
+        $data    = json_decode($res->getContent(), true);
+        $this->data[] = $data['data'];
 
-        // add calendar to list
-        // return new calendar instance
+        end($this->data);
+        $key = key($this->data);
+
+        $this->calendars[$key] = new Calendar($data['data'], $adapter);
+        return $this->calendars[$key];
     }
 
     public function deleteCalendar($id) {

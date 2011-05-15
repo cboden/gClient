@@ -24,9 +24,16 @@ class Response implements RI {
             $this->header  = substr($response, 0, $this->xfer_info['header_size']);
             $this->content = trim(substr($response, $this->xfer_info['header_size']));
 
-            if (false !== ($loc = $this->getHeaderItem('Location'))) {
-                curl_setopt($req, CURLOPT_URL, $loc);
+            $code = $this->getStatusCode();
+            if ($code < 300 || $code > 399) {
+                break;
             }
+
+            if (false === ($loc = $this->getHeaderItem('Location'))) {
+                break;
+            }
+
+            curl_setopt($req, CURLOPT_URL, $loc);
         } while ($i <= 5);
 
         curl_close($req);
@@ -36,7 +43,7 @@ class Response implements RI {
      * @returns int 3 digit HTTP status code
      */
     public function getStatusCode() {
-        return $this->xfer_info['http_code'];
+        return (int)$this->xfer_info['http_code'];
     }
 
     /**
