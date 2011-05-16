@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen; http://apigen.org" />
+	<title>Class gClient\Auth\ClientLogin</title>
+
+	<link rel="stylesheet" href="resources/style.css?v=2011051603" type="text/css" media="all" />
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />	<script type="text/javascript" src="resources/combined.js"></script>
+	<script type="text/javascript" src="allclasses.js"></script>
+</head>
+
+<body>
+<div id="left">
+	<a href="allclasses.html">All Classes</a>
+
+	<h3>Namespaces</h3>
+	<ul>
+		<li class="active"><a href="namespace-gClient.Auth.html">gClient\Auth</a>
+		</li>
+		<li><a href="namespace-gClient.Calendar.html">gClient\Calendar</a>
+		</li>
+		<li><a href="namespace-gClient.HTTP.html">gClient\HTTP</a>
+		<ul>
+		<li><a href="namespace-gClient.HTTP.cURL.html">gClient\HTTP\cURL</a>
+		</ul></li>
+		<li><a href="namespace-PHP.html">PHP</a>
+		</li>
+	</ul>
+
+	<hr />
+
+	<h3>Classes</h3>
+
+	<ul>
+		<li><a href="gClient.Auth.Adapter.html">Adapter</a></li>
+
+		<li><a href="gClient.Auth.Anonymous.html">Anonymous</a></li>
+
+		<li class="active"><a href="gClient.Auth.ClientLogin.html">ClientLogin</a></li>
+
+	</ul>
+
+	<h3>Interfaces</h3>
+
+	<ul>
+		<li><a href="gClient.Auth.AuthenticatorInterface.html">AuthenticatorInterface</a></li>
+
+	</ul>
+
+	<h3>Exceptions</h3>
+
+	<ul>
+		<li><a href="gClient.Auth.CaptchaException.html">CaptchaException</a></li>
+
+		<li><a href="gClient.Auth.Exception.html">Exception</a></li>
+
+		<li><a href="gClient.Auth.InvalidTokenException.html">InvalidTokenException</a></li>
+
+	</ul>
+</div>
+
+<div id="right">
+	<form action="http://www.google.com/cse" id="search" onsubmit="if(this.q.value.indexOf('more:')==-1)this.q.value+=' more:api'">
+		<input type="hidden" name="cx" value="011549293477758430224:vxofa9ufnhc" /><input type="hidden" name="ie" value="UTF-8" /><input type="text" name="q" class="text" /><input type="submit" value="Search" />
+	</form>
+
+<div id="navigation">
+	<ul>
+		<li><a href="overview.html" title="Summary of all namespaces">Overview</a></li>		<li><a href="namespace-gClient.Auth.html" title="Summary of gClient\Auth">Namespace</a></li>
+		<li class="active">Class</li>
+		<li><a href="elements.html">Elements</a></li>
+	</ul>
+</div>
+
+<div id="content">
+	<div id="classSummary">		<p>namespace <a href="namespace-gClient.Auth.html">gClient\Auth</a></p>
+
+		<h1>Class ClientLogin</h1>
+		<div class="classDescription">
+
+		
+<p>This Authentication class allows the developer to connect to the Google API
+with a standard username/password combination</p>
+
+		</div>
+		<dl class="tree">
+
+			<dd style="padding-left:0px">				<a href="gClient.Auth.Adapter.html">gClient\Auth\Adapter</a>
+				 implements <a href="gClient.Auth.AuthenticatorInterface.html">AuthenticatorInterface</a>
+			</dd>
+			<dd style="padding-left:30px">				<img src="resources/inherit.gif" alt="extended by" />
+<b>gClient\Auth\ClientLogin</b>				
+			</dd>
+		</dl>
+
+		<div class="classInfo">
+			
+			<b>Located at</b> <a href="source-gClient.Auth.ClientLogin.php.html#4">/gClient/Auth/ClientLogin.php</a><br />
+		</div>
+	</div>
+
+	<div id="methodSummary">
+
+		<table class="summary">
+		<caption>Method Summary</caption>
+		<tr data-order="1 __construct" id="___construct">
+
+			<td align="right" width="1%"><code class="nowrap">
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td>
+			<a class="anchor" href="#___construct">#</a>
+			<code class="nowrap">
+				<a href="source-gClient.Auth.ClientLogin.php.html#17" title="go to source code"><b>__construct</b></a>(
+					string
+					<var>$username</var>, 
+					string
+					<var>$password</var>, 
+					string
+					<var>$client</var>
+			)</code>
+
+			<div class="short">
+				
+			</div>
+
+			<div class="detailed">
+				
+
+
+					<h4>Parameters</h4>
+					<div class="smallList">
+						<code>$username</code> string Your Google Account account name (email address)<br />
+						<code>$password</code> string <br />
+						<code>$client</code> string Short string identifying your application, for Google's logging purposes. This
+string should take the form: „companyName-applicationName-versionID“.<br />
+					</div>
+
+
+					<h4>Throws</h4>
+					<div class="smallList">
+						<a href="gClient.Auth.Exception.html">Exception</a> <br />
+					</div>
+
+			</div>
+			</td>
+		</tr>
+
+
+		</table>
+	</div>
+
+
+	<h2>Methods Inherited From <a href="gClient.Auth.Adapter.html#methodSummary">Adapter</a></h2>
+	<div class="box"><code>
+		<a href="gClient.Auth.Adapter.html#___construct">__construct()</a>, <a href="gClient.Auth.Adapter.html#___sleep">__sleep()</a>, <a href="gClient.Auth.Adapter.html#___wakeup">__wakeup()</a>, <a href="gClient.Auth.Adapter.html#_setRequester">setRequester()</a>, <a href="gClient.Auth.Adapter.html#_reqFactory">reqFactory()</a>
+	</code></div>
+
+	<div id="constantSummary">
+
+		<table class="summary">
+		<caption>Constant Summary</caption>
+		<tr data-order="URL" id="URL">
+			<td align="right" width="1%"><code><b>URL</b></code></td>
+			<td><code><span class="php-quote">'/accounts/ClientLogin'</span></code> <a href="#URL" class="anchor">#</a></td>
+		</tr>
+		<tr data-order="SERVICE" id="SERVICE">
+			<td align="right" width="1%"><code><b>SERVICE</b></code></td>
+			<td><code><span class="php-quote">'cl'</span></code> <a href="#SERVICE" class="anchor">#</a></td>
+		</tr>
+		</table>
+	</div>
+
+	<h2>Constants Inherited From <a href="gClient.Auth.Adapter.html#constantSummary">Adapter</a></h2>
+	<div class="box"><code>BASE_URL, PROTOCOL_VERSION, DEFAULT_CLIENT_CLASS</code></div>
+
+
+	<h2>Properties Inherited From <a href="gClient.Auth.Adapter.html#propertySummary">Adapter</a></h2>
+	<div class="box"><code><var>$verify_token_on_restoration</var>, <var>$token</var>, <var>$req_class</var></code></div>
+
+</div>
+
+	<div id="footer">
+		gClient generated by <a href="http://apigen.org">ApiGen</a>
+	</div>
+</div>
+</body>
+</html>

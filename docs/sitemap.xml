@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+	<loc>/Countable.html</loc>
+</url>
+<url>
+	<loc>/DateTime.html</loc>
+</url>
+<url>
+	<loc>/Exception.html</loc>
+</url>
+<url>
+	<loc>/gClient.Auth.Adapter.html</loc>
+</url>
+<url>
+	<loc>/gClient.Auth.Anonymous.html</loc>
+</url>
+<url>
+	<loc>/gClient.Auth.AuthenticatorInterface.html</loc>
+</url>
+<url>
+	<loc>/gClient.Auth.CaptchaException.html</loc>
+</url>
+<url>
+	<loc>/gClient.Auth.ClientLogin.html</loc>
+</url>
+<url>
+	<loc>/gClient.Auth.Exception.html</loc>
+</url>
+<url>
+	<loc>/gClient.Auth.InvalidTokenException.html</loc>
+</url>
+<url>
+	<loc>/gClient.Calendar.Calendar.html</loc>
+</url>
+<url>
+	<loc>/gClient.Calendar.Catalog.html</loc>
+</url>
+<url>
+	<loc>/gClient.Calendar.Event.html</loc>
+</url>
+<url>
+	<loc>/gClient.HTTP.ClientInterface.html</loc>
+</url>
+<url>
+	<loc>/gClient.HTTP.cURL.Client.html</loc>
+</url>
+<url>
+	<loc>/gClient.HTTP.cURL.Exception.html</loc>
+</url>
+<url>
+	<loc>/gClient.HTTP.cURL.Response.html</loc>
+</url>
+<url>
+	<loc>/gClient.HTTP.ResponseInterface.html</loc>
+</url>
+<url>
+	<loc>/Iterator.html</loc>
+</url>
+<url>
+	<loc>/SeekableIterator.html</loc>
+</url>
+<url>
+	<loc>/Traversable.html</loc>
+</url>
+</urlset>

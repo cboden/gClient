@@ -2,14 +2,9 @@
 namespace gClient\Auth;
 
 /**
- * This Authentication class allows the developer to connect
- * to the Google API with a standard username/password combination
+ * This Authentication class allows the developer to connect to the Google API with a standard username/password combination
  */
 class ClientLogin extends Adapter {
-    /**
-     * The URL defining the ClientLogin protocol
-     * @var string
-     */
     const URL = '/accounts/ClientLogin';
 
     /**
@@ -20,9 +15,9 @@ class ClientLogin extends Adapter {
     const SERVICE = 'cl';
 
     /**
-     * @param string $username
-     * @param string $password
-     * @param string $client
+     * @param string Your Google Account account name (email address)
+     * @param string
+     * @param string Short string identifying your application, for Google's logging purposes. This string should take the form: "companyName-applicationName-versionID".
      * @throws Exception
      */
     public function __construct($username, $password, $client) {
@@ -51,7 +46,8 @@ class ClientLogin extends Adapter {
 
     /**
      * Used by the parent Adapter class to pass authentication token
-     * @returns string
+     * @internal
+     * @return string
      */
     public function getHeaderString() {
         return 'Authorization: GoogleLogin auth=%s';

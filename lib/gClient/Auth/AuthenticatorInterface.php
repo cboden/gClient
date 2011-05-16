@@ -3,7 +3,8 @@ namespace gClient\Auth;
 
 interface AuthenticatorInterface {
     /**
-     * @returns string
+     * @return string
+     * @internal
      */
     public function getHeaderString();
 }

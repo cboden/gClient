@@ -12,13 +12,39 @@ const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full';
 
 // new SplPriorityQueue
 
+/**
+ * This is the main Calendar controlling class
+ * It's class name is subject to change before 1.0
+ */
 class Catalog implements \SeekableIterator, \Countable {
+    /**
+     * Adapter to use to make HTTP calls with
+     * @var \gClient\Auth\Adapter
+     */
     protected $adapter;
+
+    /**
+     * Calendar data list returned from Google
+     * @var Array
+     */
     protected $data;
 
+    /**
+     * Array of Calendar objects (cache)
+     * @var Array
+     */
     protected $calendars = Array();
-    protected $pos       = 0;
 
+    /**
+     * Internal pointer for looping through Calendar objects
+     * @var int
+     */
+    protected $pos = 0;
+
+    /**
+     * @param \gClient\Auth\Adapter
+     * @param boolean TRUE to list only the calendars owned/created by user | FALSE to list all calendars in users' list
+     */
     public function __construct(Adapter $adapter, $only_owner = false) {
         $this->adapter = $adapter;
 
@@ -27,6 +53,12 @@ class Catalog implements \SeekableIterator, \Countable {
         $this->data = $data['data'];
     }
 
+    /**
+     * @param string Name of calendar to create
+     * @param Array Additional configuration array of data for creating the calendar
+     * @return Calendar
+     * @todo Finish attributes (functionality and documentation)
+     */
     public function createCalendar($name, Array $attributes = Array()) {
         $content = json_encode(Array('data' => Array(
             'title'    => $name
@@ -49,6 +81,10 @@ class Catalog implements \SeekableIterator, \Countable {
         return $this->calendars[$key];
     }
 
+    /**
+     * @param string ID of the calendar to delete
+     * @see \gClient\Calendar\Calendar
+     */
     public function deleteCalendar($id) {
     }
 
@@ -59,14 +95,14 @@ class Catalog implements \SeekableIterator, \Countable {
     }
 
     /**
-     * @returns int
+     * @return int
      */
     public function count() {
         return count($this->data['items']);
     }
 
     /**
-     * @param mixed(int|url-id) $position
+     * @param mixed(int|url-id)
      */
     public function seek($position) {
         $this->pos = $pos;
@@ -79,7 +115,7 @@ class Catalog implements \SeekableIterator, \Countable {
     }
 
     /**
-     * @returns \gClient\Calendar\Calendar
+     * @return Calendar
      */
     public function current() {
         if (!isset($this->calendars[$this->pos])) {
@@ -89,6 +125,9 @@ class Catalog implements \SeekableIterator, \Countable {
         return $this->calendars[$this->pos];
     }
 
+    /**
+     * @return int
+     */
     public function key() {
         return $this->pos;
     }
@@ -102,7 +141,7 @@ class Catalog implements \SeekableIterator, \Countable {
     }
 
     /**
-     * @returns bool
+     * @return bool
      */
     public function valid() {
         return isset($this->data['items'][$this->pos]);

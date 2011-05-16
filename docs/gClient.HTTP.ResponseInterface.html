@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen; http://apigen.org" />
+	<title>Interface gClient\HTTP\ResponseInterface</title>
+
+	<link rel="stylesheet" href="resources/style.css?v=2011051603" type="text/css" media="all" />
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />	<script type="text/javascript" src="resources/combined.js"></script>
+	<script type="text/javascript" src="allclasses.js"></script>
+</head>
+
+<body>
+<div id="left">
+	<a href="allclasses.html">All Classes</a>
+
+	<h3>Namespaces</h3>
+	<ul>
+		<li><a href="namespace-gClient.Auth.html">gClient\Auth</a>
+		</li>
+		<li><a href="namespace-gClient.Calendar.html">gClient\Calendar</a>
+		</li>
+		<li class="active"><a href="namespace-gClient.HTTP.html">gClient\HTTP</a>
+		<ul>
+		<li><a href="namespace-gClient.HTTP.cURL.html">gClient\HTTP\cURL</a>
+		</ul></li>
+		<li><a href="namespace-PHP.html">PHP</a>
+		</li>
+	</ul>
+
+	<hr />
+
+	<h3>Classes</h3>
+
+	<ul>
+	</ul>
+
+	<h3>Interfaces</h3>
+
+	<ul>
+		<li><a href="gClient.HTTP.ClientInterface.html">ClientInterface</a></li>
+
+		<li class="active"><a href="gClient.HTTP.ResponseInterface.html">ResponseInterface</a></li>
+
+	</ul>
+
+	<h3>Exceptions</h3>
+
+	<ul>
+	</ul>
+</div>
+
+<div id="right">
+	<form action="http://www.google.com/cse" id="search" onsubmit="if(this.q.value.indexOf('more:')==-1)this.q.value+=' more:api'">
+		<input type="hidden" name="cx" value="011549293477758430224:vxofa9ufnhc" /><input type="hidden" name="ie" value="UTF-8" /><input type="text" name="q" class="text" /><input type="submit" value="Search" />
+	</form>
+
+<div id="navigation">
+	<ul>
+		<li><a href="overview.html" title="Summary of all namespaces">Overview</a></li>		<li><a href="namespace-gClient.HTTP.html" title="Summary of gClient\HTTP">Namespace</a></li>
+		<li class="active">Class</li>
+		<li><a href="elements.html">Elements</a></li>
+	</ul>
+</div>
+
+<div id="content">
+	<div id="classSummary">		<p>namespace <a href="namespace-gClient.HTTP.html">gClient\HTTP</a></p>
+
+		<h1>Interface ResponseInterface</h1>
+		<div>
+
+			<h4>Direct Known Implementers</h4>
+			<a href="gClient.HTTP.cURL.Response.html">gClient\HTTP\cURL\Response</a>
+		</div>
+
+		<div class="classInfo">
+			<b>Abstract Interface</b><br />
+			<b>Located at</b> <a href="source-gClient.HTTP.ResponseInterface.php.html#3">/gClient/HTTP/ResponseInterface.php</a><br />
+		</div>
+	</div>
+
+	<div id="methodSummary">
+
+		<table class="summary">
+		<caption>Method Summary</caption>
+		<tr data-order="1 __construct" id="___construct">
+
+			<td align="right" width="1%"><code class="nowrap">
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td>
+			<a class="anchor" href="#___construct">#</a>
+			<code class="nowrap">
+				<a href="source-gClient.HTTP.ResponseInterface.php.html#5" title="go to source code"><b>__construct</b></a>(
+					mixed
+					<var>$response</var>
+			)</code>
+
+			<div class="short">
+				
+			</div>
+
+			<div class="detailed">
+				
+
+
+					<h4>Parameters</h4>
+					<div class="smallList">
+						<code>$response</code> mixed Response from Requester<br />
+					</div>
+
+
+
+			</div>
+			</td>
+		</tr>
+
+		<tr data-order="1 getStatusCode" id="_getStatusCode">
+
+			<td align="right" width="1%"><code class="nowrap">
+				 public 
+				int
+				
+				</code>
+			</td>
+
+			<td>
+			<a class="anchor" href="#_getStatusCode">#</a>
+			<code class="nowrap">
+				<a href="source-gClient.HTTP.ResponseInterface.php.html#10" title="go to source code"><b>getStatusCode</b></a>(
+			)</code>
+
+			<div class="short">
+				
+			</div>
+
+			<div class="detailed">
+				
+
+
+
+					<h4>Returns</h4>
+					<div class="smallList">int 3 digit HTTP status code</div>
+
+
+			</div>
+			</td>
+		</tr>
+
+		<tr data-order="1 getHeaderItem" id="_getHeaderItem">
+
+			<td align="right" width="1%"><code class="nowrap">
+				 public 
+				mixed(string|boolean)
+				
+				</code>
+			</td>
+
+			<td>
+			<a class="anchor" href="#_getHeaderItem">#</a>
+			<code class="nowrap">
+				<a href="source-gClient.HTTP.ResponseInterface.php.html#15" title="go to source code"><b>getHeaderItem</b></a>(
+					string
+					<var>$key</var>
+			)</code>
+
+			<div class="short">
+				
+			</div>
+
+			<div class="detailed">
+				
+
+
+					<h4>Parameters</h4>
+					<div class="smallList">
+						<code>$key</code> string <br />
+					</div>
+
+					<h4>Returns</h4>
+					<div class="smallList">mixed(string|boolean) </div>
+
+
+			</div>
+			</td>
+		</tr>
+
+		<tr data-order="1 getHeader" id="_getHeader">
+
+			<td align="right" width="1%"><code class="nowrap">
+				 public 
+				string
+				
+				</code>
+			</td>
+
+			<td>
+			<a class="anchor" href="#_getHeader">#</a>
+			<code class="nowrap">
+				<a href="source-gClient.HTTP.ResponseInterface.php.html#21" title="go to source code"><b>getHeader</b></a>(
+			)</code>
+
+			<div class="short">
+				
+			</div>
+
+			<div class="detailed">
+				
+
+
+
+					<h4>Returns</h4>
+					<div class="smallList">string Header lines from request</div>
+
+
+			</div>
+			</td>
+		</tr>
+
+		<tr data-order="1 getContent" id="_getContent">
+
+			<td align="right" width="1%"><code class="nowrap">
+				 public 
+				string
+				
+				</code>
+			</td>
+
+			<td>
+			<a class="anchor" href="#_getContent">#</a>
+			<code class="nowrap">
+				<a href="source-gClient.HTTP.ResponseInterface.php.html#26" title="go to source code"><b>getContent</b></a>(
+			)</code>
+
+			<div class="short">
+				
+			</div>
+
+			<div class="detailed">
+				
+
+
+
+					<h4>Returns</h4>
+					<div class="smallList">string Body of HTTP request reesponse</div>
+
+
+			</div>
+			</td>
+		</tr>
+
+
+		</table>
+	</div>
+
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		gClient generated by <a href="http://apigen.org">ApiGen</a>
+	</div>
+</div>
+</body>
+</html>

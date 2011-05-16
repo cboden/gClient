@@ -7,21 +7,12 @@ namespace gClient\Auth;
  */
 
 /**
- * Header telling Google what version of their API we're using
- * @var string
- */
-const PROTOCOL_VERSION = 'GData-Version: 2';
-
-/**
- * Base Google Authentication class.  All methods of authenticating
- * to Google should extend this class
+ * Base Google Authentication class.  All methods of authenticating to Google should extend this class
  */
 abstract class Adapter implements AuthenticatorInterface {
-    /**
-     * Base URL of Google
-     * @var string
-     */
     const BASE_URL = 'https://www.google.com';
+    const PROTOCOL_VERSION = 'GData-Version: 2';
+    const DEFAULT_CLIENT_CLASS = '\gClient\HTTP\cURL\Client';
 
     /**
      * Upon __wakeup() being called, if true, verifies with Google
@@ -30,12 +21,6 @@ abstract class Adapter implements AuthenticatorInterface {
      * @var boolean
      */
     public $verify_token_on_restoration = true;
-
-    /**
-     * Default requestor class
-     * @var string
-     */
-    const DEFAULT_CLIENT_CLASS = '\gClient\HTTP\cURL\Client';
 
     /**
      * Authentication token received from Google
@@ -53,6 +38,13 @@ abstract class Adapter implements AuthenticatorInterface {
         $this->req_class = static::DEFAULT_CLIENT_CLASS;
     }
 
+    /**
+     * Save this class in order to not re-authenticate with Google
+     * <code>
+     * <?php
+     *     $savable_string = base64_encode(serialize($obj));
+     * </code>
+     */
     public function __sleep() {
         return Array('token', 'req_class', 'verify_token_on_restoration');
     }
@@ -66,7 +58,10 @@ abstract class Adapter implements AuthenticatorInterface {
     }
 
     /**
-     * @param string $requester_class Classname of Client HTTP caller - must be instance of Requester
+     * Overwrite the default HTTP Client Request class.
+     * Class MUST be an instance of \gClient\HTTP\ClientInterface
+     * @param string Classname of Client HTTP caller
+     * @throws Exception
      */
     public function setRequester($requester_class) {
         if (!class_exists($requester_class)) {
@@ -82,8 +77,9 @@ abstract class Adapter implements AuthenticatorInterface {
     }
 
     /**
-     * @param string $url
-     * @returns mixed Instance of previousl set requestor class
+     * Create an HTTP request class
+     * @param string The URL to request
+     * @return \gClient\HTTP\ResponseInterface Instance of previously set requestor class
      */
     public function reqFactory($url) {
         $class  = $this->req_class;
@@ -93,11 +89,7 @@ abstract class Adapter implements AuthenticatorInterface {
             ->setParameter('alt', 'jsonc')
             ->addHeader('Content-Type: application/json')
             ->addHeader(sprintf(static::getHeaderString(), $this->token))
-            ->addHeader(PROTOCOL_VERSION)
+            ->addHeader(static::PROTOCOL_VERSION)
         ;
-    }
-
-    public function getToken() {
-        return $this->token;
     }
 }

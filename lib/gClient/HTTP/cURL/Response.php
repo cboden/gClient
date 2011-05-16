@@ -3,14 +3,28 @@ namespace gClient\HTTP\cURL;
 use gClient\HTTP\ResponseInterface as RI;
 
 class Response implements RI {
+    /**
+     * @uses curl_getinfo
+     * @var Array
+     */
     protected $xfer_info;
+
+    /**
+     * Header from HTTP response
+     * @var string
+     */
     protected $header;
+
+    /**
+     * Body from HTTP response
+     * @var string
+     */
     protected $content;
 
     /**
-     * @param mixed $response Response from Requester
+     * @param mixed Response from Requester
      */
-    public function __construct($req) {
+    public function __construct($response) {
         $i = 0;
         do {
             $i++;
@@ -40,15 +54,15 @@ class Response implements RI {
     }
 
     /**
-     * @returns int 3 digit HTTP status code
+     * @return int 3 digit HTTP status code
      */
     public function getStatusCode() {
         return (int)$this->xfer_info['http_code'];
     }
 
     /**
-     * @param string $key
-     * @returns mixed(string|boolean)
+     * @param string
+     * @return mixed(string|boolean)
      */
     public function getHeaderItem($key) {
         $needle = "\n{$key}: ";
@@ -62,14 +76,14 @@ class Response implements RI {
     }
 
     /**
-     * @returns string Header lines from request
+     * @return string Header lines from request
      */
     public function getHeader() {
         return $this->header;
     }
 
     /**
-     * @returns string Body of HTTP request reesponse
+     * @return string Body of HTTP request reesponse
      */
     public function getContent() {
         return $this->content;

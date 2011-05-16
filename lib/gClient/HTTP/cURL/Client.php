@@ -17,8 +17,8 @@ class Client implements CI {
     protected $method  =  'GET';
 
     /**
-     * @param string $url Valid URL to call
-     * @returns $this
+     * @param string Valid URL to call
+     * @return $this
      */
     public function __construct($url) {
         if (!(boolean)filter_var($url, FILTER_VALIDATE_URL)) {
@@ -30,8 +30,8 @@ class Client implements CI {
     }
 
     /**
-     * @param string $header Method to call
-     * @returns $this
+     * @param string Method to call
+     * @return $this
      */
     public function method($method) {
         $method = strtoupper((string)$method);
@@ -45,7 +45,7 @@ class Client implements CI {
 
     /**
      * @param mixed(array|object|string) Data to be set as client body
-     * @returns $this
+     * @return $this
      */
     public function setRawData($data) {
         if (is_array($data) || is_object($data)) {
@@ -57,9 +57,9 @@ class Client implements CI {
     }
 
     /**
-     * @param string $key
-     * @param string $val
-     * @returns $this
+     * @param string
+     * @param string
+     * @return $this
      */
     public function setParameter($key, $val) {
         $this->params[$key] = $val;
@@ -67,8 +67,8 @@ class Client implements CI {
     }
 
     /**
-     * @param string $header Add a header to the HTTP request
-     * @returns $this
+     * @param string Add a header to the HTTP request
+     * @return $this
      */
     public function addHeader($header) {
         $this->headers[] = $header;
@@ -76,8 +76,8 @@ class Client implements CI {
     }
 
     /**
-     * @param Array $parameters An associative array with key/val parings to be sent to setParameter()
-     * @returns $this
+     * @param Array An associative array with key/val parings to be sent to setParameter()
+     * @return $this
      */
     public function setParameters(Array $parameters = Array()) {
         foreach ($parameters as $key => $val) {
@@ -88,8 +88,8 @@ class Client implements CI {
     }
 
     /**
-     * @param Array $headers Headers to be added to the request
-     * @returns $this
+     * @param Array Headers to be added to the request
+     * @return $this
      */
     public function addHeaders(Array $headers = Array()) {
         $this->headers += $headers;
@@ -98,7 +98,7 @@ class Client implements CI {
 
     /**
      * Make the HTTP request
-     * @returns Response
+     * @return Response
      */
     public function request() {
         $this->opts[CURLOPT_HTTPHEADER] = $this->headers;

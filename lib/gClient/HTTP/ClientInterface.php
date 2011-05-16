@@ -3,51 +3,51 @@ namespace gClient\HTTP;
 
 interface ClientInterface {
     /**
-     * @param string $url Valid URL to call
-     * @returns $this
+     * @param string Valid URL to call
+     * @return $this
      */
     public function __construct($url);
 
     /**
-     * @param string $header Method to call
-     * @returns $this
+     * @param string Method to call
+     * @return $this
      */
     public function method($method);
 
     /**
      * @param mixed(array|object|string) Data to be set as client body
-     * @returns $this
+     * @return $this
      */
     public function setRawData($data);
 
     /**
-     * @param string $key
-     * @param string $val
-     * @returns $this
+     * @param string
+     * @param string
+     * @return $this
      */
     public function setParameter($key, $val);
 
     /**
-     * @param string $header Add a header to the HTTP request
-     * @returns $this
+     * @param string Add a header to the HTTP request
+     * @return $this
      */
     public function addHeader($header);
 
     /**
-     * @param Array $parameters An associative array with key/val parings to be sent to setParameter()
-     * @returns $this
+     * @param Array An associative array with key/val parings to be sent to setParameter()
+     * @return $this
      */
     public function setParameters(Array $parameters = Array());
 
     /**
-     * @param Array $headers Headers to be added to the request
-     * @returns $this
+     * @param Array Headers to be added to the request
+     * @return $this
      */
     public function addHeaders(Array $headers = Array());
 
     /**
      * Make the HTTP request
-     * @returns ResponseInterface
+     * @return ResponseInterface
      */
     public function request();
 }
