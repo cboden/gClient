@@ -5,7 +5,7 @@
 	<meta name="generator" content="ApiGen; http://apigen.org" />
 	<title>Class gClient\Calendar\Catalog</title>
 
-	<link rel="stylesheet" href="resources/style.css?v=2011051603" type="text/css" media="all" />
+	<link rel="stylesheet" href="resources/style.css?v=2011051605" type="text/css" media="all" />
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />	<script type="text/javascript" src="resources/combined.js"></script>
 	<script type="text/javascript" src="allclasses.js"></script>
 </head>
@@ -38,6 +38,8 @@
 		<li class="active"><a href="gClient.Calendar.Catalog.html">Catalog</a></li>
 
 		<li><a href="gClient.Calendar.Event.html">Event</a></li>
+
+		<li><a href="gClient.Calendar.Settings.html">Settings</a></li>
 
 	</ul>
 
@@ -84,7 +86,7 @@ It's class name is subject to change before 1.0</p>
 
 		<div class="classInfo">
 			
-			<b>Located at</b> <a href="source-gClient.Calendar.Catalog.php.html#15">/gClient/Calendar/Catalog.php</a><br />
+			<b>Located at</b> <a href="source-gClient.Calendar.Catalog.php.html#17">/gClient/Calendar/Catalog.php</a><br />
 		</div>
 	</div>
 
@@ -104,7 +106,7 @@ It's class name is subject to change before 1.0</p>
 			<td>
 			<a class="anchor" href="#___construct">#</a>
 			<code class="nowrap">
-				<a href="source-gClient.Calendar.Catalog.php.html#44" title="go to source code"><b>__construct</b></a>(
+				<a href="source-gClient.Calendar.Catalog.php.html#50" title="go to source code"><b>__construct</b></a>(
 					<a href="gClient.Auth.Adapter.html">gClient\Auth\Adapter</a>
 					
 					<var>$adapter</var>, 
@@ -133,6 +135,68 @@ calendars in users' list<br />
 			</td>
 		</tr>
 
+		<tr data-order="1 __get" id="___get">
+
+			<td align="right" width="1%"><code class="nowrap">
+				 public 
+				
+				&amp;
+				</code>
+			</td>
+
+			<td>
+			<a class="anchor" href="#___get">#</a>
+			<code class="nowrap">
+				<a href="source-gClient.Calendar.Catalog.php.html#61" title="go to source code"><b>__get</b></a>(
+					
+					<var>$name</var>
+			)</code>
+
+			<div class="short">
+				
+			</div>
+
+			<div class="detailed">
+				
+
+
+
+
+
+			</div>
+			</td>
+		</tr>
+
+		<tr data-order="1 fetchSettings" id="_fetchSettings">
+
+			<td align="right" width="1%"><code class="nowrap">
+				 protected 
+				
+				
+				</code>
+			</td>
+
+			<td>
+			<a class="anchor" href="#_fetchSettings">#</a>
+			<code class="nowrap">
+				<a href="source-gClient.Calendar.Catalog.php.html#73" title="go to source code"><b>fetchSettings</b></a>(
+			)</code>
+
+			<div class="short">
+				
+			</div>
+
+			<div class="detailed">
+				
+
+
+
+
+
+			</div>
+			</td>
+		</tr>
+
 		<tr data-order="1 createCalendar" id="_createCalendar">
 
 			<td align="right" width="1%"><code class="nowrap">
@@ -145,7 +209,7 @@ calendars in users' list<br />
 			<td>
 			<a class="anchor" href="#_createCalendar">#</a>
 			<code class="nowrap">
-				<a href="source-gClient.Calendar.Catalog.php.html#56" title="go to source code"><b>createCalendar</b></a>(
+				<a href="source-gClient.Calendar.Catalog.php.html#83" title="go to source code"><b>createCalendar</b></a>(
 					string
 					<var>$name</var>, 
 					array
@@ -188,7 +252,7 @@ calendars in users' list<br />
 			<td>
 			<a class="anchor" href="#_deleteCalendar">#</a>
 			<code class="nowrap">
-				<a href="source-gClient.Calendar.Catalog.php.html#84" title="go to source code"><b>deleteCalendar</b></a>(
+				<a href="source-gClient.Calendar.Catalog.php.html#111" title="go to source code"><b>deleteCalendar</b></a>(
 					string
 					<var>$id</var>
 			)</code>
@@ -224,7 +288,7 @@ calendars in users' list<br />
 			<td>
 			<a class="anchor" href="#_subscribeToCalendar">#</a>
 			<code class="nowrap">
-				<a href="source-gClient.Calendar.Catalog.php.html#90" title="go to source code"><b>subscribeToCalendar</b></a>(
+				<a href="source-gClient.Calendar.Catalog.php.html#117" title="go to source code"><b>subscribeToCalendar</b></a>(
 			)</code>
 
 			<div class="short">
@@ -254,7 +318,7 @@ calendars in users' list<br />
 			<td>
 			<a class="anchor" href="#_unsubscribeFromCalendar">#</a>
 			<code class="nowrap">
-				<a href="source-gClient.Calendar.Catalog.php.html#93" title="go to source code"><b>unsubscribeFromCalendar</b></a>(
+				<a href="source-gClient.Calendar.Catalog.php.html#120" title="go to source code"><b>unsubscribeFromCalendar</b></a>(
 			)</code>
 
 			<div class="short">
@@ -284,7 +348,7 @@ calendars in users' list<br />
 			<td>
 			<a class="anchor" href="#_count">#</a>
 			<code class="nowrap">
-				<a href="source-gClient.Calendar.Catalog.php.html#97" title="go to source code"><b>count</b></a>(
+				<a href="source-gClient.Calendar.Catalog.php.html#124" title="go to source code"><b>count</b></a>(
 			)</code>
 
 			<div class="short">
@@ -318,7 +382,7 @@ calendars in users' list<br />
 			<td>
 			<a class="anchor" href="#_seek">#</a>
 			<code class="nowrap">
-				<a href="source-gClient.Calendar.Catalog.php.html#104" title="go to source code"><b>seek</b></a>(
+				<a href="source-gClient.Calendar.Catalog.php.html#131" title="go to source code"><b>seek</b></a>(
 					mixed(int|url-id)
 					<var>$position</var>
 			)</code>
@@ -356,7 +420,7 @@ calendars in users' list<br />
 			<td>
 			<a class="anchor" href="#_current">#</a>
 			<code class="nowrap">
-				<a href="source-gClient.Calendar.Catalog.php.html#117" title="go to source code"><b>current</b></a>(
+				<a href="source-gClient.Calendar.Catalog.php.html#144" title="go to source code"><b>current</b></a>(
 			)</code>
 
 			<div class="short">
@@ -390,7 +454,7 @@ calendars in users' list<br />
 			<td>
 			<a class="anchor" href="#_key">#</a>
 			<code class="nowrap">
-				<a href="source-gClient.Calendar.Catalog.php.html#128" title="go to source code"><b>key</b></a>(
+				<a href="source-gClient.Calendar.Catalog.php.html#155" title="go to source code"><b>key</b></a>(
 			)</code>
 
 			<div class="short">
@@ -424,7 +488,7 @@ calendars in users' list<br />
 			<td>
 			<a class="anchor" href="#_next">#</a>
 			<code class="nowrap">
-				<a href="source-gClient.Calendar.Catalog.php.html#134" title="go to source code"><b>next</b></a>(
+				<a href="source-gClient.Calendar.Catalog.php.html#161" title="go to source code"><b>next</b></a>(
 			)</code>
 
 			<div class="short">
@@ -456,7 +520,7 @@ calendars in users' list<br />
 			<td>
 			<a class="anchor" href="#_rewind">#</a>
 			<code class="nowrap">
-				<a href="source-gClient.Calendar.Catalog.php.html#138" title="go to source code"><b>rewind</b></a>(
+				<a href="source-gClient.Calendar.Catalog.php.html#165" title="go to source code"><b>rewind</b></a>(
 			)</code>
 
 			<div class="short">
@@ -488,7 +552,7 @@ calendars in users' list<br />
 			<td>
 			<a class="anchor" href="#_valid">#</a>
 			<code class="nowrap">
-				<a href="source-gClient.Calendar.Catalog.php.html#143" title="go to source code"><b>valid</b></a>(
+				<a href="source-gClient.Calendar.Catalog.php.html#170" title="go to source code"><b>valid</b></a>(
 			)</code>
 
 			<div class="short">
@@ -522,6 +586,19 @@ calendars in users' list<br />
 
 		<table class="summary">
 		<caption>Property Summary</caption>
+		<tr data-order="readonly" id="$readonly">
+
+			<td align="right" width="1%"><code class="nowrap">
+				protected 
+				
+			</code></td>
+
+			<td width="1%"><var>$readonly</var></td>
+			<td><pre><span class="php-keyword1">array</span> (
+)</pre></td>
+			<td> <a href="#$readonly" class="anchor">#</a></td>
+		</tr>
+
 		<tr data-order="adapter" id="$adapter">
 
 			<td align="right" width="1%"><code class="nowrap">
@@ -572,6 +649,15 @@ calendars in users' list<br />
 		</tr>
 
 
+		<tr data-order="settings" id="$settings">
+			<td align="right" width="1%"><code class="nowrap">
+				magic <a href="gClient.Calendar.Settings.html">Settings</a>
+			</code></td>
+
+			<td width="1%"><var>$settings</var></td>
+			<td></td>
+			<td>A settings object of the Adapter users' Google Calendar Settings <a href="#$settings" class="anchor">#</a></td>
+		</tr>
 		</table>
 	</div>
 

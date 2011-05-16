@@ -6,6 +6,8 @@ use SplDoublyLinkedList, Closure;
 const ALL_LIST_URL   = '/calendar/feeds/default/allcalendars/full';
 const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full';
 
+const SETTINGS_URL = '/calendar/feeds/default/settings';
+
 // maybe to list generation on construct
 // Catalog, Listing, Library, Directory
 // Manager, Cabnet, Composite, ???
@@ -15,8 +17,12 @@ const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full';
 /**
  * This is the main Calendar controlling class
  * It's class name is subject to change before 1.0
+ * 
+ * @property Settings $settings A settings object of the Adapter users' Google Calendar Settings
  */
 class Catalog implements \SeekableIterator, \Countable {
+    protected $readonly = Array();
+
     /**
      * Adapter to use to make HTTP calls with
      * @var \gClient\Auth\Adapter
@@ -51,6 +57,27 @@ class Catalog implements \SeekableIterator, \Countable {
         $response = $adapter->reqFactory($adapter::BASE_URL . ((boolean)$only_owner ? OWNER_LIST_URL : ALL_LIST_URL))->method('GET')->request();
         $data = json_decode($response->getContent(), true);
         $this->data = $data['data'];
+    }
+
+    public function &__get($name) {
+        if ($name == 'settings') {
+            $this->fetchSettings();
+        }
+
+        if (!isset($this->readonly[$name])) {
+            $this->readonly[$name] = '';
+        }
+
+        return $this->readonly[$name];
+    }
+
+    protected function fetchSettings() {
+        if (isset($this->readonly['settings'])) {
+            return;
+        }
+
+        $adp = $this->adapter;
+        $this->readonly['settings'] = new Settings($adp->reqFactory($adp::BASE_URL . SETTINGS_URL)->request());
     }
 
     /**
