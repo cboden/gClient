@@ -24,7 +24,7 @@ class Response implements RI {
     /**
      * @param mixed Response from Requester
      */
-    public function __construct($response) {
+    public function __construct($req) {
         $i = 0;
         do {
             $i++;
