@@ -34,6 +34,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
 
     public function testFluentInterface() {
         $this->assertSame($this->_client, $this->_client->method('GET'));
+        $this->assertSame($this->_client, $this->_client->setRawData('a'));
         $this->assertSame($this->_client, $this->_client->setParameter('a', 'b'));
         $this->assertSame($this->_client, $this->_client->addHeader('a'));
         $this->assertSame($this->_client, $this->_client->setParameters(Array('a' => 'b')));

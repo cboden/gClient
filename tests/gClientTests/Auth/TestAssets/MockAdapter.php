@@ -4,6 +4,7 @@ use gClient\Auth\Adapter;
 
 class MockAdapter extends Adapter {
     public function __construct($connect_successfully = true) {
+        parent::__construct();
         $this->token = (int)$connect_successfully;
     }
 
