@@ -9,7 +9,7 @@ class AuthenticatedTest extends \PHPUnit_Framework_TestCase {
         $this->_adapter = new MockAdapter();
     }
 
-    public function testHeader() {
-        $this->assertEquals($this->_adapter->getHeaderString(), 'Hello World!');
+    public function testHeader() { // this isn't useful...
+        $this->assertEquals($this->_adapter->getHeaderString(), 'Auth: MockLogin %s');
     }
 }

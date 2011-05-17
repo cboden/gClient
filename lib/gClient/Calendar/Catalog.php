@@ -4,11 +4,6 @@ use gClient\Auth\Adapter;
 use gClient\HTTP;
 use SplDoublyLinkedList, Closure;
 
-const ALL_LIST_URL   = '/calendar/feeds/default/allcalendars/full';
-const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full';
-
-const SETTINGS_URL = '/calendar/feeds/default/settings';
-
 // maybe to list generation on construct
 // Catalog, Listing, Library, Directory
 // Manager, Cabnet, Composite, ???
@@ -23,6 +18,11 @@ const SETTINGS_URL = '/calendar/feeds/default/settings';
  */
 class Catalog implements \SeekableIterator, \Countable {
     protected $readonly = Array();
+
+    const ALL_LIST_URL   = '/calendar/feeds/default/allcalendars/full';
+    const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full';
+
+    const SETTINGS_URL = '/calendar/feeds/default/settings';
 
     /**
      * Adapter to use to make HTTP calls with
@@ -55,7 +55,7 @@ class Catalog implements \SeekableIterator, \Countable {
     public function __construct(Adapter $adapter, $only_owner = false) {
         $this->adapter = $adapter;
 
-        $response = $adapter->reqFactory($adapter::BASE_URL . ((boolean)$only_owner ? OWNER_LIST_URL : ALL_LIST_URL))->method('GET')->request();
+        $response = $adapter->reqFactory($adapter::BASE_URL . ((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
         $data = json_decode($response->getContent(), true);
         $this->data = $data['data'];
     }
@@ -78,7 +78,7 @@ class Catalog implements \SeekableIterator, \Countable {
         }
 
         $adp = $this->adapter;
-        $this->readonly['settings'] = new Settings($adp->reqFactory($adp::BASE_URL . SETTINGS_URL)->request());
+        $this->readonly['settings'] = new Settings($adp->reqFactory($adp::BASE_URL . static::SETTINGS_URL)->request());
     }
 
     /**
@@ -101,7 +101,7 @@ class Catalog implements \SeekableIterator, \Countable {
         }
 
         $adapter = $this->adapter;
-        $res     = $adapter->reqFactory($adapter::BASE_URL . OWNER_LIST_URL)->method('POST')->setRawData(Array('data' => $content))->request();
+        $res     = $adapter->reqFactory($adapter::BASE_URL . static::OWNER_LIST_URL)->method('POST')->setRawData(Array('data' => $content))->request();
         if (201 != ($http_code = $res->getStatusCode())) {
             throw new HTTP\Exception($res);
         }
@@ -117,10 +117,11 @@ class Catalog implements \SeekableIterator, \Countable {
     }
 
     /**
-     * @param string ID of the calendar to delete
+     * @param Calendar|string ID of the calendar to delete
      * @see \gClient\Calendar\Calendar
      */
     public function deleteCalendar($id) {
+        
     }
 
     public function subscribeToCalendar() {
