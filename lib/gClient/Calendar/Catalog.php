@@ -72,15 +72,6 @@ class Catalog implements \SeekableIterator, \Countable {
         return $this->readonly[$name];
     }
 
-    protected function fetchSettings() {
-        if (isset($this->readonly['settings'])) {
-            return;
-        }
-
-        $adp = $this->adapter;
-        $this->readonly['settings'] = new Settings($adp->reqFactory($adp::BASE_URL . static::SETTINGS_URL)->request());
-    }
-
     /**
      * @param string $name Name of calendar to create
      * @param Array Additional configuration array of data for creating the calendar
@@ -118,10 +109,33 @@ class Catalog implements \SeekableIterator, \Countable {
 
     /**
      * @param Calendar|string ID of the calendar to delete
-     * @see \gClient\Calendar\Calendar
+     * @return boolean
+     * @throws HTTP\Exception
      */
-    public function deleteCalendar($id) {
-        
+    public function deleteCalendar($calendar) {
+        $adp = $this->adapter;
+        $url = $calendar;
+
+        if ($calendar instanceof Calendar) {
+            $url = $calendar->selfLink;
+        }
+
+        if (!(boolean)filter_var($url, FILTER_VALIDATE_URL)) {
+            $url = $adp::BASE_URL . $url;
+
+            if (!(boolean)filter_var($url, FILTER_VALIDATE_URL)) {
+                throw new \UnexpectedValueException("Unable to make call to {$calendar}, not a valid URL");
+            }
+        }
+
+        $res = $adp->reqFactory($url)->method('DELETE')->request();
+        if ($res->getStatusCode() != 200) {
+            throw new HTTP\Exception($res);
+        }
+
+        // remove internal pointers
+
+        return true;
     }
 
     public function subscribeToCalendar() {
@@ -138,7 +152,7 @@ class Catalog implements \SeekableIterator, \Countable {
     }
 
     /**
-     * @param mixed(int|url-id)
+     * @param int|string
      */
     public function seek($position) {
         $this->pos = $pos;
@@ -181,5 +195,14 @@ class Catalog implements \SeekableIterator, \Countable {
      */
     public function valid() {
         return isset($this->data['items'][$this->pos]);
+    }
+
+    protected function fetchSettings() {
+        if (isset($this->readonly['settings'])) {
+            return;
+        }
+
+        $adp = $this->adapter;
+        $this->readonly['settings'] = new Settings($adp->reqFactory($adp::BASE_URL . static::SETTINGS_URL)->request());
     }
 }

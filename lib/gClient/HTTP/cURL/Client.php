@@ -120,6 +120,7 @@ class Client implements CI {
                 $this->opts[CURLOPT_CUSTOMREQUEST] = 'PUT';
                 break;
             case 'DELETE':
+                $this->opts[CURLOPT_CUSTOMREQUEST] = 'DELETE';
                 break;
             default:
                 throw new Exception("Invalid method: {$this->method}");
