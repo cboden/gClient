@@ -1,6 +1,7 @@
 <?php
 namespace gClient\Calendar;
 use gClient\Auth\Adapter;
+use gClient\HTTP;
 use SplDoublyLinkedList, Closure;
 
 const ALL_LIST_URL   = '/calendar/feeds/default/allcalendars/full';
@@ -81,24 +82,31 @@ class Catalog implements \SeekableIterator, \Countable {
     }
 
     /**
-     * @param string Name of calendar to create
+     * @param string $name Name of calendar to create
      * @param Array Additional configuration array of data for creating the calendar
      * @return Calendar
-     * @todo Finish attributes (functionality and documentation)
+     * @throws \UnexpectedValueException On an empty name/title or invalid color
+     * @throws \gClient\HTTP\Exception On a bad return from Google
      */
-    public function createCalendar($name, Array $attributes = Array()) {
-        $content = json_encode(Array('data' => Array(
-            'title'    => $name
-          , 'details'  => 'description goes here'
-          , 'timeZone' => 'America/Toronto'
-          , 'hidden'   => false
-          , 'color'    => '#2952A3'
-          , 'location' => 'London'
-        )));
+    public function createCalendar($name = null, Array $attributes = Array()) {
+        // I'm still on the fence of which wasy this should be...currently $attributes['title'] wins...
+        $content = $attributes + Array('title' => $name);
+
+        if (is_null($content['title']) || empty($content['title'])) {
+            throw new \UnexpectedValueException('Calendar name/title should be set');
+        }
+
+        if (isset($content['color']) && !in_array($content['color'], Calendar::$valid_colors)) {
+            throw new \UnexpectedValueException("{$content['color']} is not a valid calendar color");
+        }
 
         $adapter = $this->adapter;
-        $res     = $adapter->reqFactory($adapter::BASE_URL . OWNER_LIST_URL)->method('POST')->setRawData($content)->request();
-        $data    = json_decode($res->getContent(), true);
+        $res     = $adapter->reqFactory($adapter::BASE_URL . OWNER_LIST_URL)->method('POST')->setRawData(Array('data' => $content))->request();
+        if (201 != ($http_code = $res->getStatusCode())) {
+            throw new HTTP\Exception($res);
+        }
+
+        $data = json_decode($res->getContent(), true);
         $this->data[] = $data['data'];
 
         end($this->data);
