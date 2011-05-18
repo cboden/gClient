@@ -2,12 +2,9 @@
 namespace gClient\Auth;
 
 /**
- * @see http://code.google.com/apis/gdata/docs/developers-guide.html
- * @see http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html
- */
-
-/**
  * Base Google Authentication class.  All methods of authenticating to Google should extend this class
+ * @link http://code.google.com/apis/gdata/docs/developers-guide.html
+ * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html
  */
 abstract class Adapter implements AuthenticatorInterface {
     const BASE_URL = 'https://www.google.com';
@@ -82,6 +79,19 @@ abstract class Adapter implements AuthenticatorInterface {
      * @return \gClient\HTTP\ResponseInterface Instance of previously set requestor class
      */
     public function reqFactory($url) {
+        static $base_len = 0;
+        if ($base_len === 0) {
+            $base_len = strlen(static::BASE_URL);
+        }
+
+        if (substr($url, 0, $base_len) != static::BASE_URL) {
+            if (substr($url, 0, 1) != '/') {
+                $url = '/' . $url;
+            }
+
+            $url = static::BASE_URL . $url;
+        }
+
         $class  = $this->req_class;
         $client = new $class($url);
 

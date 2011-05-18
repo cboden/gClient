@@ -15,9 +15,15 @@ use SplDoublyLinkedList, Closure;
  * It's class name is subject to change before 1.0
  * 
  * @property Settings $settings A settings object of the Adapter users' Google Calendar Settings
+ * @link http://code.google.com/apis/calendar/data/2.0/reference.html
  */
 class Catalog implements \SeekableIterator, \Countable {
+    /**
+     * @internal
+     */
     protected $readonly = Array();
+
+    const SERVICE = 'cl';
 
     const ALL_LIST_URL   = '/calendar/feeds/default/allcalendars/full';
     const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full';
@@ -55,7 +61,7 @@ class Catalog implements \SeekableIterator, \Countable {
     public function __construct(Adapter $adapter, $only_owner = false) {
         $this->adapter = $adapter;
 
-        $response = $adapter->reqFactory($adapter::BASE_URL . ((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
+        $response = $adapter->reqFactory(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
         $data = json_decode($response->getContent(), true);
         $this->data = $data['data'];
     }
@@ -92,7 +98,7 @@ class Catalog implements \SeekableIterator, \Countable {
         }
 
         $adapter = $this->adapter;
-        $res     = $adapter->reqFactory($adapter::BASE_URL . static::OWNER_LIST_URL)->method('POST')->setRawData(Array('data' => $content))->request();
+        $res     = $adapter->reqFactory(static::OWNER_LIST_URL)->method('POST')->setRawData(Array('data' => $content))->request();
         if (201 != ($http_code = $res->getStatusCode())) {
             throw new HTTP\Exception($res);
         }
@@ -110,25 +116,15 @@ class Catalog implements \SeekableIterator, \Countable {
     /**
      * @param Calendar|string ID of the calendar to delete
      * @return boolean
-     * @throws HTTP\Exception
+     * @throws \gClient\HTTP\Exception
      */
     public function deleteCalendar($calendar) {
-        $adp = $this->adapter;
         $url = $calendar;
-
         if ($calendar instanceof Calendar) {
             $url = $calendar->selfLink;
         }
 
-        if (!(boolean)filter_var($url, FILTER_VALIDATE_URL)) {
-            $url = $adp::BASE_URL . $url;
-
-            if (!(boolean)filter_var($url, FILTER_VALIDATE_URL)) {
-                throw new \UnexpectedValueException("Unable to make call to {$calendar}, not a valid URL");
-            }
-        }
-
-        $res = $adp->reqFactory($url)->method('DELETE')->request();
+        $res = $this->adapter->reqFactory($url)->method('DELETE')->request();
         if ($res->getStatusCode() != 200) {
             throw new HTTP\Exception($res);
         }
@@ -138,7 +134,11 @@ class Catalog implements \SeekableIterator, \Countable {
         return true;
     }
 
-    public function subscribeToCalendar() {
+    /**
+     * @param string ID-URL of calendar to subscribe to
+     * @return Calendar
+     */
+    public function subscribeToCalendar($id_url) {
     }
 
     public function unsubscribeFromCalendar() {
@@ -202,7 +202,6 @@ class Catalog implements \SeekableIterator, \Countable {
             return;
         }
 
-        $adp = $this->adapter;
-        $this->readonly['settings'] = new Settings($adp->reqFactory($adp::BASE_URL . static::SETTINGS_URL)->request());
+        $this->readonly['settings'] = new Settings($this->adapter->reqFactory(static::SETTINGS_URL)->request());
     }
 }

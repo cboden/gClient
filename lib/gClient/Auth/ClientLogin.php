@@ -1,5 +1,6 @@
 <?php
 namespace gClient\Auth;
+use gClient\HTTP;
 
 /**
  * This Authentication class allows the developer to connect to the Google API with a standard username/password combination
@@ -18,12 +19,14 @@ class ClientLogin extends Adapter {
      * @param string Your Google Account account name (email address)
      * @param string
      * @param string Short string identifying your application, for Google's logging purposes. This string should take the form: "companyName-applicationName-versionID".
-     * @throws Exception
+     * @throws \gClient\HTTP\Exception
      */
     public function __construct($username, $password, $client) {
         parent::__construct();
 
-        $req = $this->reqFactory(static::BASE_URL . static::URL)
+        $req = new $this->req_class(static::BASE_URL . static::URL);
+
+        $res = $req
             ->method('POST')
             ->setParameters(Array(
                 'Email'       => $username
@@ -34,13 +37,13 @@ class ClientLogin extends Adapter {
             ))
         ->request();
 
-        if ($req->getStatusCode() == 200) {
+        if ($res->getStatusCode() == 200) {
             $needle = 'Auth=';
-            $body   = $req->getContent();
+            $body   = $res->getContent();
             $this->token = trim(substr($body, strpos($body, $needle) + strlen($needle))); // should I do this through a parent fn?
         } else {
-            echo $req->getHeader();
-            throw new Exception('Error');
+            echo $res->getHeader();
+            throw new HTTP\Exception($res);
         }
     }
 
