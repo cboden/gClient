@@ -1,6 +1,7 @@
 <?php
 namespace gClient\HTTP\cURL;
 use gClient\HTTP\ClientInterface as CI;
+use gClient\HTTP;
 
 /**
  * @link http://code.google.com/apis/gdata/articles/using_cURL.html
@@ -102,6 +103,8 @@ class Client implements CI {
     /**
      * Make the HTTP request
      * @return Response
+     * @throws \gClient\HTTP\Exception If the server returns a status code of 300 or greater
+     * @throws \Exception If an invalid HTTP Method was set
      */
     public function request() {
         $this->opts[CURLOPT_HTTPHEADER] = $this->headers;
@@ -131,6 +134,13 @@ class Client implements CI {
 
         $req = curl_init();
         curl_setopt_array($req, $this->opts);
-        return new Response($req);
+
+        $response = new Response($req);
+
+        if ($response->getStatusCode() >= 300) {
+            throw new HTTP\Exception($response);
+        }
+
+        return $response;
     }
 }

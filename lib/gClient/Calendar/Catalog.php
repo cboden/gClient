@@ -64,11 +64,6 @@ class Catalog implements \SeekableIterator, \Countable {
         $this->adapter = $adapter;
 
         $response = $adapter->reqFactory(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
-
-        if ($response->getStatusCode() != 200) {
-            throw new HTTP\Exception($response);
-        }
-
         $data = json_decode($response->getContent(), true);
         $this->data = $data['data'];
     }

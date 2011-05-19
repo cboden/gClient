@@ -41,7 +41,6 @@ class ClientLogin extends Adapter {
             $body   = $res->getContent();
             $this->token = trim(substr($body, strpos($body, $needle) + strlen($needle))); // should I do this through a parent fn?
         } else {
-            echo $res->getHeader();
             throw new HTTP\Exception($res);
         }
     }
