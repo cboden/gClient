@@ -15,7 +15,8 @@ use SplDoublyLinkedList, Closure;
  * It's class name is subject to change before 1.0
  * 
  * @property Settings $settings A settings object of the Adapter users' Google Calendar Settings
- * @link http://code.google.com/apis/calendar/data/2.0/reference.html
+ * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html Calendar API Protocol documentation
+ * @link http://code.google.com/apis/calendar/data/2.0/reference.html Calendar property reference
  */
 class Catalog implements \SeekableIterator, \Countable {
     /**

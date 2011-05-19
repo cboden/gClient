@@ -3,8 +3,8 @@ namespace gClient\Auth;
 
 /**
  * Base Google Authentication class.  All methods of authenticating to Google should extend this class
- * @link http://code.google.com/apis/gdata/docs/developers-guide.html
- * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html
+ * @link http://code.google.com/apis/gdata/docs/developers-guide.html Developer's Guide Overview
+ * @link http://code.google.com/apis/gdata/docs/auth/overview.html Detailing various Authentication methods
  */
 abstract class Adapter implements AuthenticatorInterface {
     const BASE_URL = 'https://www.google.com';

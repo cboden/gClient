@@ -2,6 +2,9 @@
 namespace gClient\HTTP\cURL;
 use gClient\HTTP\ClientInterface as CI;
 
+/**
+ * @link http://code.google.com/apis/gdata/articles/using_cURL.html
+ */
 class Client implements CI {
     protected static $default_opts = Array(
         CURLOPT_HEADER         => true

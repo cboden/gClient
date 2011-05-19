@@ -4,7 +4,8 @@ use gClient\HTTP;
 
 /**
  * OAuth2 Protocol
- * @link https://code.google.com/apis/console
+ * @link https://code.google.com/apis/console Developer URL to generate OAuth2 Authorization
+ * @link http://code.google.com/apis/accounts/docs/OAuth2.html Using OAuth2 to access Google APIs
  */
 class OAuth extends Adapter {
     const TOKEN_REQ_URL  = 'https://accounts.google.com/o/oauth2/auth';
@@ -15,12 +16,26 @@ class OAuth extends Adapter {
     const GRANT_AUTH = 'authorization_code';
     const GRANT_REF  = 'refresh_token';
 
+    /**
+     * Google API Project Secret
+     * @var string
+     */
     protected $client_id;
+
+    /**
+     * Google API Project Client secret
+     * @var string
+     */
     protected $client_secret;
+
+    /**
+     * Authenticated refresh token received from Google
+     * @var string
     protected $refresh;
 
     /**
      * @param string Your Google API Project Client ID
+     * @param string Your Google API Project Client secret
      */
     public function __construct($client_id, $client_secret) {
         parent::__construct();
@@ -51,7 +66,6 @@ class OAuth extends Adapter {
     /**
      * After the user approves your application turn the temporary token into a permenant token
      * @param string The user code (query string parameter) given back to your redirect URI
-     * @param string Your Google API Project Client secret
      * @throws \gData\HTTP\Exception
      */
     public function requestAuthToken($user_code) {
@@ -76,6 +90,8 @@ class OAuth extends Adapter {
     }
 
     /**
+     * Refresh the short-lived Access Token
+     * This will need to be called every hour
      */
     public function refreshToken() {
         $req = new $this->req_class(static::TOKEN_AUTH_URL);
@@ -93,6 +109,11 @@ class OAuth extends Adapter {
         $this->token = $token_data['access_token'];
     }
 
+    /**
+     * Used by the parent Adapter class to pass authentication token
+     * @internal
+     * @return string
+     */
     public function getHeaderString() {
         return 'Authorization: OAuth %s';
     }
