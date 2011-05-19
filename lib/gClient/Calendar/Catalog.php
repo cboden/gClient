@@ -23,7 +23,8 @@ class Catalog implements \SeekableIterator, \Countable {
      */
     protected $readonly = Array();
 
-    const SERVICE = 'cl';
+    const CLIENTLOGIN_SERVICE = 'cl';
+    const OAUTH_SCOPE         = 'https://www.google.com/calendar/feeds/';
 
     const ALL_LIST_URL   = '/calendar/feeds/default/allcalendars/full';
     const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full';
@@ -62,6 +63,11 @@ class Catalog implements \SeekableIterator, \Countable {
         $this->adapter = $adapter;
 
         $response = $adapter->reqFactory(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
+
+        if ($response->getStatusCode() != 200) {
+            throw new HTTP\Exception($response);
+        }
+
         $data = json_decode($response->getContent(), true);
         $this->data = $data['data'];
     }

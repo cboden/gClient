@@ -50,6 +50,10 @@ class Response implements RI {
             curl_setopt($req, CURLOPT_URL, $loc);
         } while ($i <= 5);
 
+        if ($i == 6) {
+            throw new Exception("Too many redirects");
+        }
+
         curl_close($req);
     }
 

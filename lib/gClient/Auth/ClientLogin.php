@@ -25,7 +25,6 @@ class ClientLogin extends Adapter {
         parent::__construct();
 
         $req = new $this->req_class(static::BASE_URL . static::URL);
-
         $res = $req
             ->method('POST')
             ->setParameters(Array(
