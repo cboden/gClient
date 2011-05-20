@@ -28,6 +28,8 @@ class OAuth extends \gClient\Connection {
      */
     protected $client_secret;
 
+    protected $expires = null;
+
     /**
      * Authenticated refresh token received from Google
      * @var string
@@ -46,7 +48,7 @@ class OAuth extends \gClient\Connection {
     }
 
     public function __sleep() {
-        return Array('auth_token', 'ref_token', 'client_id', 'client_secret', 'services', 'req_class', 'verify_token_on_restoration');
+        return Array('auth_token', 'ref_token', 'expires', 'client_id', 'client_secret', 'services', 'req_class', 'verify_token_on_restoration');
     }
 
     /**
@@ -88,6 +90,7 @@ class OAuth extends \gClient\Connection {
         $token_data       = json_decode($res->getContent(), true);
         $this->auth_token = $token_data['access_token'];
         $this->ref_token  = $token_data['refresh_token'];
+        $this->setExpiration($token_data['expires_in']);
     }
 
     /**
@@ -107,6 +110,16 @@ class OAuth extends \gClient\Connection {
 
         $token_data       = json_decode($res->getContent(), true);
         $this->auth_token = $token_data['access_token'];
+        $this->setExpiration($token_data['expires_in']);
+    }
+
+    protected function setExpiration($expires) {
+        $zone = new \DateTimeZone('UTC');
+        $now  = new \DateTime(null, $zone);
+        $exp  = clone $now;
+        $exp->add(new \DateInterval("PT{$expires}S"));
+
+        $this->expires = $exp;
     }
 
     public function prepareCall($url) {
