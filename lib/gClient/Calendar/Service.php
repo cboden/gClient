@@ -1,6 +1,6 @@
 <?php
 namespace gClient\Calendar;
-use gClient\Auth\Adapter;
+use gClient\Connection;
 use gClient\HTTP;
 use SplDoublyLinkedList, Closure;
 
@@ -14,11 +14,11 @@ use SplDoublyLinkedList, Closure;
  * This is the main Calendar controlling class
  * It's class name is subject to change before 1.0
  * 
- * @property Settings $settings A settings object of the Adapter users' Google Calendar Settings
+ * @property Settings $settings A settings object of the Connection users' Google Calendar Settings
  * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html Calendar API Protocol documentation
  * @link http://code.google.com/apis/calendar/data/2.0/reference.html Calendar property reference
  */
-class Catalog implements \SeekableIterator, \Countable {
+class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countable {
     /**
      * @internal
      */
@@ -27,16 +27,20 @@ class Catalog implements \SeekableIterator, \Countable {
     const CLIENTLOGIN_SERVICE = 'cl';
     const OAUTH_SCOPE         = 'https://www.google.com/calendar/feeds/';
 
+    const PROTOCOL_VERSION = 'GData-Version: 2';
+    const CONTENT_TYPE     = 'application/json';
+    const ALT              = 'jsonc';
+
     const ALL_LIST_URL   = '/calendar/feeds/default/allcalendars/full';
     const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full';
 
     const SETTINGS_URL = '/calendar/feeds/default/settings';
 
     /**
-     * Adapter to use to make HTTP calls with
-     * @var \gClient\Auth\Adapter
+     * Connection to use to make HTTP calls with
+     * @var \gClient\Connection
      */
-    protected $adapter;
+    protected $connection;
 
     /**
      * Calendar data list returned from Google
@@ -57,13 +61,14 @@ class Catalog implements \SeekableIterator, \Countable {
     protected $pos = 0;
 
     /**
-     * @param \gClient\Auth\Adapter
+     * @param \gClient\Connection
      * @param boolean TRUE to list only the calendars owned/created by user | FALSE to list all calendars in users' list
      */
-    public function __construct(Adapter $adapter, $only_owner = false) {
-        $this->adapter = $adapter;
+    public function __construct(Connection $connection) {
+        $only_owner = false;
+        $this->connection = $connection;
 
-        $response = $adapter->reqFactory(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
+        $response = $this->prepareCall(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
         $data = json_decode($response->getContent(), true);
         $this->data = $data['data'];
     }
@@ -78,6 +83,10 @@ class Catalog implements \SeekableIterator, \Countable {
         }
 
         return $this->readonly[$name];
+    }
+
+    public function prepareCall($url) {
+        return $this->connection->prepareCall($url)->addHeader(static::PROTOCOL_VERSION)->addHeader('Content-Type: ' . static::CONTENT_TYPE)->setParameter('alt', static::ALT);
     }
 
     /**
@@ -99,8 +108,7 @@ class Catalog implements \SeekableIterator, \Countable {
             throw new \UnexpectedValueException("{$content['color']} is not a valid calendar color");
         }
 
-        $adapter = $this->adapter;
-        $res     = $adapter->reqFactory(static::OWNER_LIST_URL)->method('POST')->setRawData(Array('data' => $content))->request();
+        $res = $this->prepareCall(static::OWNER_LIST_URL)->method('POST')->setRawData(Array('data' => $content))->request();
         if (201 != ($http_code = $res->getStatusCode())) {
             throw new HTTP\Exception($res);
         }
@@ -111,7 +119,7 @@ class Catalog implements \SeekableIterator, \Countable {
         end($this->data);
         $key = key($this->data);
 
-        $this->calendars[$key] = new Calendar($data['data'], $adapter);
+        $this->calendars[$key] = new Calendar($data['data'], $this->connection);
         return $this->calendars[$key];
     }
 
@@ -126,7 +134,7 @@ class Catalog implements \SeekableIterator, \Countable {
             $url = $calendar->selfLink;
         }
 
-        $res = $this->adapter->reqFactory($url)->method('DELETE')->request();
+        $res = $this->prepareCall($url)->method('DELETE')->request();
         if ($res->getStatusCode() != 200) {
             throw new HTTP\Exception($res);
         }
@@ -171,7 +179,7 @@ class Catalog implements \SeekableIterator, \Countable {
      */
     public function current() {
         if (!isset($this->calendars[$this->pos])) {
-            $this->calendars[$this->pos] = new Calendar($this->data['items'][$this->pos], $this->adapter);
+            $this->calendars[$this->pos] = new Calendar($this->data['items'][$this->pos], $this->connection);
         }
 
         return $this->calendars[$this->pos];
@@ -204,6 +212,6 @@ class Catalog implements \SeekableIterator, \Countable {
             return;
         }
 
-        $this->readonly['settings'] = new Settings($this->adapter->reqFactory(static::SETTINGS_URL)->request());
+        $this->readonly['settings'] = new Settings($this->prepareCall(static::SETTINGS_URL)->request());
     }
 }

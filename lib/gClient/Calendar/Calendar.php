@@ -1,6 +1,6 @@
 <?php
 namespace gClient\Calendar;
-use gClient\Auth\Adapter;
+use gClient\Connection;
 use DateTime;
 
 /**
@@ -26,10 +26,10 @@ use DateTime;
  */
 class Calendar {
     /**
-     * Adapter to use to make HTTP calls with
-     * @var \gClient\Auth\Adapter
+     * Connection to use to make HTTP calls with
+     * @var \gClient\Connection
      */
-    protected $adapter;
+    protected $connection;
 
     /**
      * Data from Google associated with it
@@ -55,11 +55,11 @@ class Calendar {
      * @param gClient\Auth\Adapter|NULL Authenticated account to use or null for an anonymouse (read-only) connection
      * @todo Change $catalog_data to mixed - URL to fetch, Array if from Catalog
      */
-    public function __construct(Array $catalog_data, Adapter $adapter = null) {
-        if (is_null($adapter)) {
-            $adapter = new Auth\Anonymous();
+    public function __construct(Array $catalog_data, Connection $connection = null) {
+        if (is_null($connection)) {
+            $connection = new Auth\Anonymous();
         }
-        $this->adapter = $adapter;
+        $this->connection = $connection;
 
         $this->info = $catalog_data;
     }
@@ -69,7 +69,7 @@ class Calendar {
     }
 
     public function __sleep() {
-        return Array('adapter', 'info');
+        return Array('connection', 'info');
     }
 
     /**

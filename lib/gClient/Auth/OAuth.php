@@ -7,7 +7,7 @@ use gClient\HTTP;
  * @link https://code.google.com/apis/console Developer URL to generate OAuth2 Authorization
  * @link http://code.google.com/apis/accounts/docs/OAuth2.html Using OAuth2 to access Google APIs
  */
-class OAuth extends Adapter {
+class OAuth extends \gClient\Connection {
     const TOKEN_REQ_URL  = 'https://accounts.google.com/o/oauth2/auth';
     const TOKEN_AUTH_URL = 'https://accounts.google.com/o/oauth2/token';
 
@@ -31,7 +31,8 @@ class OAuth extends Adapter {
     /**
      * Authenticated refresh token received from Google
      * @var string
-    protected $refresh;
+     */
+    protected $ref_token;
 
     /**
      * @param string Your Google API Project Client ID
@@ -45,8 +46,15 @@ class OAuth extends Adapter {
     }
 
     public function __sleep() {
-        return Array('token', 'refresh', 'client_id', 'client_secret', 'req_class', 'verify_token_on_restoration');
+        return Array('auth_token', 'ref_token', 'client_id', 'client_secret', 'services', 'req_class', 'verify_token_on_restoration');
     }
+
+    /*
+    public function __wakeup() {
+        // check expiration time on token
+        // if past (or maybe within 5 minutes) refresh()
+    }
+     */
 
     /**
      * Get the URL to redirect your user to in order to approve your application to access their account
@@ -69,8 +77,7 @@ class OAuth extends Adapter {
      * @throws \gData\HTTP\Exception
      */
     public function requestAuthToken($user_code) {
-        $req = new $this->req_class(static::TOKEN_AUTH_URL);
-        $res = $req
+        $res = parent::prepareCall(static::TOKEN_AUTH_URL)
             ->method('POST')
             ->setParameters(Array(
                 'code'          => $user_code
@@ -84,9 +91,9 @@ class OAuth extends Adapter {
             throw new HTTP\Exception($res);
         }
 
-        $token_data    = json_decode($res->getContent(), true);
-        $this->token   = $token_data['access_token'];
-        $this->refresh = $token_data['refresh_token'];
+        $token_data       = json_decode($res->getContent(), true);
+        $this->auth_token = $token_data['access_token'];
+        $this->ref_token  = $token_data['refresh_token'];
     }
 
     /**
@@ -94,28 +101,25 @@ class OAuth extends Adapter {
      * This will need to be called every hour
      */
     public function refreshToken() {
-        $req = new $this->req_class(static::TOKEN_AUTH_URL);
-        $res = $req
+        $res = parent::prepareCall(static::TOKEN_AUTH_URL)
             ->method('POST')
             ->setParameters(Array(
                 'client_id'     => $this->client_id
               , 'client_secret' => $this->client_secret
-              , 'refresh_token' => $this->refresh
+              , 'refresh_token' => $this->ref_token
               , 'grant_type'    => static::GRANT_REF
             ))
         ->request();
 
-        $token_data  = json_decode($res->getContent(), true);
-        $this->token = $token_data['access_token'];
+        $token_data       = json_decode($res->getContent(), true);
+        $this->auth_token = $token_data['access_token'];
     }
 
-    /**
-     * Used by the parent Adapter class to pass authentication token
-     * @internal
-     * @return string
-     */
-    public function getHeaderString() {
-        return 'Authorization: OAuth %s';
+    public function prepareCall($url) {
+        // check token exparation - refresh if past time (or 30 seconds)
+        // ->addHeader('Host: accounts.google.com') // This can be put in OAuth maybe
+
+        return parent::prepareCall($url)->addHeader("Authorization: OAuth {$this->auth_token}");
     }
 
     /**
@@ -123,7 +127,7 @@ class OAuth extends Adapter {
      * @param string Access Token given back from Google after a successful requestAuthToken()
      */
     public function setAccessToken($token) {
-        $this->token = $token;
+        $this->auth_token = $token;
     }
 
     /**
@@ -131,6 +135,6 @@ class OAuth extends Adapter {
      * @param string Refresh Token given back from Google after a successful requestAuthToken()
      */
     public function setRefreshToken($token) {
-        $this->refresh = $token;
+        $this->ref_token = $token;
     }
 }

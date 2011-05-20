@@ -5,15 +5,10 @@ use gClient\HTTP;
 /**
  * This Authentication class allows the developer to connect to the Google API with a standard username/password combination
  */
-class ClientLogin extends Adapter {
-    const URL = '/accounts/ClientLogin';
+class ClientLogin extends \gClient\Connection {
+    const URI = '/accounts/ClientLogin';
 
-    /**
-     * CL stands for Calendar...http://code.google.com/apis/gClient/faq.html#clientlogin
-     * @note this needs to be changed to be injected
-     * @var string
-     */
-    const SERVICE = 'cl';
+    protected $credentials = Array();
 
     /**
      * @param string Your Google Account account name (email address)
@@ -22,35 +17,46 @@ class ClientLogin extends Adapter {
      * @throws \gClient\HTTP\Exception
      */
     public function __construct($username, $password, $client) {
-        parent::__construct();
+        $this->credentials = compact('username', 'password', 'client');
+    }
 
-        $req = new $this->req_class(static::BASE_URL . static::URL);
-        $res = $req
+    /**
+     * Authenticate against Google to make private calls
+     * @throws \RuntimeException If more than one (or no) services have been added via \gClient\Connection::addService()
+     * @throws \gClient\HTTP\Exception If authentication against Google fails
+     * @return $this
+     */
+    public function authenticate() {
+        if (count($this->services) !== 1) {
+            throw new \RuntimeException('ClientLogin requires exactly one service');
+        }
+
+        $service = $this->getServiceClass(current(array_keys($this->services)));
+        extract($this->credentials);
+
+        $res = parent::prepareCall(static::URI)
             ->method('POST')
             ->setParameters(Array(
                 'Email'       => $username
               , 'accountType' => 'HOSTED_OR_GOOGLE'
               , 'Passwd'      => $password
               , 'source'      => $client
-              , 'service'     => static::SERVICE
+              , 'service'     => $service::CLIENTLOGIN_SERVICE
             ))
         ->request();
 
-        if ($res->getStatusCode() == 200) {
-            $needle = 'Auth=';
-            $body   = $res->getContent();
-            $this->token = trim(substr($body, strpos($body, $needle) + strlen($needle))); // should I do this through a parent fn?
-        } else {
+        if ($res->getStatusCode() != 200) {
             throw new HTTP\Exception($res);
         }
+
+        $needle = 'Auth=';
+        $body   = $res->getContent();
+        $this->auth_token = trim(substr($body, strpos($body, $needle) + strlen($needle))); // should I do this through a parent fn?
+
+        return $this;
     }
 
-    /**
-     * Used by the parent Adapter class to pass authentication token
-     * @internal
-     * @return string
-     */
-    public function getHeaderString() {
-        return 'Authorization: GoogleLogin auth=%s';
+    public function prepareCall($url) {
+        return parent::prepareCall($url)->addHeader("Authorization: GoogleLogin auth={$this->auth_token}");
     }
 }
