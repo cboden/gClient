@@ -18,12 +18,14 @@ interface ServiceInterface {
     public function prepareCall($url);
 
     /**
+     * @see \gClient\Auth\ClientLogin
      * @return string
      */
     public static function getClientLoginService();
 
     /**
-     * @retun string
+     * @see \gClient\Auth\OAuth
+     * @return string
      */
     public static function getOAuthScope();
 }

@@ -14,7 +14,7 @@ interface ResponseInterface {
 
     /**
      * @param string
-     * @return mixed(string|boolean)
+     * @return string|boolean
      */
     public function getHeaderItem($key);
 

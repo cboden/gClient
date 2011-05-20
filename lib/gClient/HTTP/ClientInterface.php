@@ -4,44 +4,44 @@ namespace gClient\HTTP;
 interface ClientInterface {
     /**
      * @param string Valid URL to call
-     * @return $this
+     * @return ClientInterface $this instance to enable a Fluent interface
      */
     public function __construct($url);
 
     /**
      * @param string Method to call
-     * @return $this
+     * @return ClientInterface $this instance to enable a Fluent interface
      */
     public function method($method);
 
     /**
-     * @param mixed(array|object|string) Data to be set as client body
-     * @return $this
+     * @param array|object|string Data to be set as client body
+     * @return ClientInterface $this instance to enable a Fluent interface
      */
     public function setRawData($data);
 
     /**
      * @param string
      * @param string
-     * @return $this
+     * @return ClientInterface $this instance to enable a Fluent interface
      */
     public function setParameter($key, $val);
 
     /**
      * @param string Add a header to the HTTP request
-     * @return $this
+     * @return ClientInterface $this instance to enable a Fluent interface
      */
     public function addHeader($header);
 
     /**
      * @param Array An associative array with key/val parings to be sent to setParameter()
-     * @return $this
+     * @return ClientInterface $this instance to enable a Fluent interface
      */
     public function setParameters(Array $parameters = Array());
 
     /**
      * @param Array Headers to be added to the request
-     * @return $this
+     * @return ClientInterface $this instance to enable a Fluent interface
      */
     public function addHeaders(Array $headers = Array());
 

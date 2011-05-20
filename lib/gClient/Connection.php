@@ -74,7 +74,7 @@ class Connection {
      * @param string Name or Classname of the service to connect to - must be instance of \gClient\ServiceInterface...maps to \gClient\{$name}\Service class
      * @throws \RuntimeException If passing the name of the service as a string but does not exist in the library
      * @throws \UnexpectedValueException If a valid class is passed but does not implement \gClient\ServiceInterface
-     * @return $this
+     * @return Connection $this instance to enable a Fluent interface
      */
     public function addService($name) {
         $this->services[$name] = $this->getServiceClass($name);
@@ -82,7 +82,7 @@ class Connection {
     }
 
     /**
-     * @return $this
+     * @return Connection $this instance to enable a Fluent interface
      */
     public function authenticate() {
         return $this;

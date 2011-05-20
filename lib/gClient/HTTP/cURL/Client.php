@@ -22,7 +22,7 @@ class Client implements CI {
 
     /**
      * @param string Valid URL to call
-     * @return $this
+     * @return Client $this instance to enable a Fluent interface
      */
     public function __construct($url) {
         if (!(boolean)filter_var($url, FILTER_VALIDATE_URL)) {
@@ -35,7 +35,7 @@ class Client implements CI {
 
     /**
      * @param string Method to call
-     * @return $this
+     * @return Client $this instance to enable a Fluent interface
      */
     public function method($method) {
         $method = strtoupper((string)$method);
@@ -48,8 +48,8 @@ class Client implements CI {
     }
 
     /**
-     * @param mixed(array|object|string) Data to be set as client body
-     * @return $this
+     * @param array|object|string Data to be set as client body
+     * @return Client $this instance to enable a Fluent interface
      */
     public function setRawData($data) {
         if (is_array($data) || is_object($data)) {
@@ -63,7 +63,7 @@ class Client implements CI {
     /**
      * @param string
      * @param string
-     * @return $this
+     * @return Client $this instance to enable a Fluent interface
      */
     public function setParameter($key, $val) {
         $this->params[$key] = $val;
@@ -72,7 +72,7 @@ class Client implements CI {
 
     /**
      * @param string Add a header to the HTTP request
-     * @return $this
+     * @return Client $this instance to enable a Fluent interface
      */
     public function addHeader($header) {
         $this->headers[] = $header;
@@ -81,7 +81,7 @@ class Client implements CI {
 
     /**
      * @param Array An associative array with key/val parings to be sent to setParameter()
-     * @return $this
+     * @return Client $this instance to enable a Fluent interface
      */
     public function setParameters(Array $parameters = Array()) {
         foreach ($parameters as $key => $val) {
@@ -93,7 +93,7 @@ class Client implements CI {
 
     /**
      * @param Array Headers to be added to the request
-     * @return $this
+     * @return Client $this instance to enable a Fluent interface
      */
     public function addHeaders(Array $headers = Array()) {
         $this->headers += $headers;

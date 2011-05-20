@@ -24,7 +24,7 @@ class ClientLogin extends \gClient\Connection {
      * Authenticate against Google to make private calls
      * @throws \RuntimeException If more than one (or no) services have been added via \gClient\Connection::addService()
      * @throws \gClient\HTTP\Exception If authentication against Google fails
-     * @return $this
+     * @return ClientLogin $this
      */
     public function authenticate() {
         if (count($this->services) !== 1) {
