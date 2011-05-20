@@ -71,9 +71,10 @@ class Connection {
 
     /**
      * Before authenticating Google needs to know what Services you want to interact with - add them here
-     * @param Name of the service to connect to...maps to \gClient\{$name}\Service class
+     * @param string Name or Classname of the service to connect to - must be instance of \gClient\ServiceInterface...maps to \gClient\{$name}\Service class
+     * @throws \RuntimeException If passing the name of the service as a string but does not exist in the library
+     * @throws \UnexpectedValueException If a valid class is passed but does not implement \gClient\ServiceInterface
      * @return $this
-     * @todo Perhaps change this to a class that has methods/constants for Scope/Service/getClass
      */
     public function addService($name) {
         $this->services[$name] = $this->getServiceClass($name);
@@ -88,7 +89,9 @@ class Connection {
     }
 
     /**
-     * @param string Name of the service to retreive - make sure you added this service via addService() before authenticating
+     * @param string Name or Class of the service to retreive - make sure you added this service via addService() before authenticating
+     * @throws \RuntimeException If passing the name of the service as a string but does not exist in the library
+     * @throws \UnexpectedValueException If a valid class is passed but does not implement \gClient\ServiceInterface
      * @return \gClient\ServiceInterface
      */
     public function getService($name) {
@@ -96,21 +99,30 @@ class Connection {
             return $this->instances[$name];
         }
 
-        $class_path = $this->getServiceClass($name);
-        $this->instances[$name] = new $class_path($this);
+        $class = $this->getServiceClass($name);
+        $this->instances[$name] = new $class($this);
         return $this->instances[$name];
     }
 
     /**
      * @param name Verify the service exists
+     * @throws \RuntimeException If passing the name of the service as a string but does not exist in the library
+     * @throws \UnexpectedValueException If a valid class is passed but does not implement \gClient\ServiceInterface
+     * @return string Class implementing \gClient\ServiceInterface
      */
     protected function getServiceClass($name) {
-        $class_path = __NAMESPACE__ . '\\' . $name . '\\Service';
-        if (!class_exists($class_path)) {
-            throw new \RuntimeException("{$name} is not a valid service");
+        $class = $name;
+
+        if (!class_exists($class)) {
+            $class = __NAMESPACE__ . '\\' . $name . '\\Service';
+            if (!class_exists($class)) {
+                throw new \RuntimeException("{$name} is not a valid service");
+            }
+        } else if (!($class instanceof \gClient\ServiceInterface)) {
+            throw new \UnexpectedValueException('Service must be an implementation of \\gClient\\ServiceInterface');
         }
 
-        return $class_path;
+        return $class;
     }
 
     /**

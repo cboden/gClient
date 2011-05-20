@@ -49,20 +49,14 @@ class OAuth extends \gClient\Connection {
         return Array('auth_token', 'ref_token', 'client_id', 'client_secret', 'services', 'req_class', 'verify_token_on_restoration');
     }
 
-    /*
-    public function __wakeup() {
-        // check expiration time on token
-        // if past (or maybe within 5 minutes) refresh()
-    }
-     */
-
     /**
      * Get the URL to redirect your user to in order to approve your application to access their account
-     * @param string The scope(s) of the user's account you wish to access
      * @param string The registered URL (to your server) to redirect the user to
      * @return string
      */
-    public function getTokenRequestURL($scope, $redirect_uri) {
+    public function getTokenRequestURL($redirect_uri) {
+        $scope = implode(' ', array_map(function($service) { return $service::getOAuthScope(); }, $this->services));
+
         return static::TOKEN_REQ_URL . '?' . http_build_query(Array(
             'client_id'     => $this->client_id
           , 'redirect_uri'  => $redirect_uri

@@ -41,7 +41,7 @@ class ClientLogin extends \gClient\Connection {
               , 'accountType' => 'HOSTED_OR_GOOGLE'
               , 'Passwd'      => $password
               , 'source'      => $client
-              , 'service'     => $service::CLIENTLOGIN_SERVICE
+              , 'service'     => $service::getClientLoginService()
             ))
         ->request();
 

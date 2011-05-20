@@ -89,6 +89,14 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
         return $this->connection->prepareCall($url)->addHeader(static::PROTOCOL_VERSION)->addHeader('Content-Type: ' . static::CONTENT_TYPE)->setParameter('alt', static::ALT);
     }
 
+    public static function getClientLoginService() {
+        return static::CLIENTLOGIN_SERVICE;
+    }
+
+    public static function getOAuthScope() {
+        return static::OAUTH_SCOPE;
+    }
+
     /**
      * @param string $name Name of calendar to create
      * @param Array Additional configuration array of data for creating the calendar
