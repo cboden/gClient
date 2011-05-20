@@ -47,6 +47,8 @@ interface ClientInterface {
 
     /**
      * Make the HTTP request
+     * @throws \gClient\HTTP\Exception If the server returns a status code of 300 or greater
+     * @throws \UnexpectedValueException If an invalid HTTP Method was set
      * @return ResponseInterface
      */
     public function request();

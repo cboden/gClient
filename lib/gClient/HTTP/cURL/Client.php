@@ -104,7 +104,7 @@ class Client implements CI {
      * Make the HTTP request
      * @return Response
      * @throws \gClient\HTTP\Exception If the server returns a status code of 300 or greater
-     * @throws \Exception If an invalid HTTP Method was set
+     * @throws \UnexpectedValueException If an invalid HTTP Method was set
      */
     public function request() {
         $this->opts[CURLOPT_HTTPHEADER] = $this->headers;
@@ -129,7 +129,7 @@ class Client implements CI {
                 $this->opts[CURLOPT_CUSTOMREQUEST] = 'DELETE';
                 break;
             default:
-                throw new Exception("Invalid method: {$this->method}");
+                throw new \UnexpectedValueException("Invalid method: {$this->method}");
         }
 
         $req = curl_init();

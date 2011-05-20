@@ -136,6 +136,9 @@ class Connection {
     /**
      * Create an HTTP request class
      * @param string The URL to request
+     * @throws \RuntimeException If class $this->client does not implement \gClient\HTTP\ClientInterface
+     * @throws \gClient\HTTP\Exception If the server returns a status code of 300 or greater
+     * @throws \UnexpectedValueException If an invalid HTTP Method was set
      * @return \gClient\HTTP\ResponseInterface Instance of previously set requestor class
      */
     public function prepareCall($url) {
@@ -147,7 +150,7 @@ class Connection {
         $client = new $class($url);
 
         if (!($client instanceof \gClient\HTTP\ClientInterface)) {
-            throw new \Exception('Requester class must be instance of HTTP\ClientInterface');
+            throw new \RuntimeException('Requester class must be instance of HTTP\ClientInterface');
         }
 
         return $client;

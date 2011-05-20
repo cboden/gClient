@@ -61,8 +61,7 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
     protected $pos = 0;
 
     /**
-     * @param \gClient\Connection
-     * @param boolean TRUE to list only the calendars owned/created by user | FALSE to list all calendars in users' list
+     * @param \gClient\Connection gData connection to make API calls through
      */
     public function __construct(Connection $connection) {
         $only_owner = false;
@@ -73,6 +72,9 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
         $this->data = $data['data'];
     }
 
+    /**
+     * @internal
+     */
     public function &__get($name) {
         if ($name == 'settings') {
             $this->fetchSettings();
@@ -85,6 +87,14 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
         return $this->readonly[$name];
     }
 
+    /**
+     * Create an HTTP request class
+     * @param string The URL to request
+     * @throws \RuntimeException If class $this->client does not implement \gClient\HTTP\ClientInterface
+     * @throws \gClient\HTTP\Exception If the server returns a status code of 300 or greater
+     * @throws \UnexpectedValueException If an invalid HTTP Method was set
+     * @return \gClient\HTTP\ResponseInterface Instance of previously set requestor class
+     */
     public function prepareCall($url) {
         return $this->connection->prepareCall($url)->addHeader(static::PROTOCOL_VERSION)->addHeader('Content-Type: ' . static::CONTENT_TYPE)->setParameter('alt', static::ALT);
     }
