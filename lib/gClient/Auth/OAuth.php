@@ -97,7 +97,7 @@ class OAuth extends \gClient\Connection {
      * Refresh the short-lived Access Token
      * This will need to be called every hour
      */
-    public function refreshToken() {
+    protected function refreshToken() {
         $res = parent::prepareCall(static::TOKEN_AUTH_URL)
             ->method('POST')
             ->setParameters(Array(
@@ -113,9 +113,14 @@ class OAuth extends \gClient\Connection {
         $this->setExpiration($token_data['expires_in']);
     }
 
+    /**
+     * Sets the time (minus 30 seconds grace) of when Google says the auth token will expire
+     * @param int Number of seconds until the token wil expire
+     */
     protected function setExpiration($expires) {
-        $zone = new \DateTimeZone('UTC');
-        $now  = new \DateTime(null, $zone);
+        $expires -= 30;
+
+        $now  = new \DateTime(null, new \DateTimeZone('UTC'));
         $exp  = clone $now;
         $exp->add(new \DateInterval("PT{$expires}S"));
 
@@ -123,10 +128,13 @@ class OAuth extends \gClient\Connection {
     }
 
     public function prepareCall($url) {
-        // check token exparation - refresh if past time (or 30 seconds)
-        // ->addHeader('Host: accounts.google.com') // This can be put in OAuth maybe
+        $now = new \DateTime(null, new \DateTimeZone('UTC'));
+        if (is_null($this->expires) || $now > $this->expires) {
+            $this->refreshToken();
+        }
 
         return parent::prepareCall($url)->addHeader("Authorization: OAuth {$this->auth_token}");
+            // ->addHeader('Host: accounts.google.com') // This can be put in OAuth maybe
     }
 
     /**
