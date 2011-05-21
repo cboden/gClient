@@ -5,6 +5,7 @@ use gClient\Calendar\Service;
 use DateTime;
 
 /**
+ * A Calendar class represents an individual calendar within Google, containing properties and events
  * @property string $unique_id The unique (Google wide) ID of the calendar
  * @property string $id The URL ID of the calendar
  * @property string $title Display name of the calendar
@@ -26,18 +27,12 @@ use DateTime;
  * @property string $timeZone
  * @property int $timesCleaned
  */
-class Calendar {
+class Calendar extends \gClient\PropertyProxy {
     /**
      * Connection to use to make HTTP calls with
      * @var \gClient\Connection
      */
     protected $connection;
-
-    /**
-     * Data from Google associated with it
-     * @var Array
-     */
-    protected $info;
 
     /**
      * These are the valid colours (I'm Canadian) you can set a calendar to
@@ -61,15 +56,11 @@ class Calendar {
         $properties['unique_id'] = substr($properties['id'], strrpos($properties['id'], '/') + 1);
 
         $this->connection = $connection;
-        $this->info       = $properties;
-    }
-
-    public function __get($var) {
-        return isset($this->info[$var]) ? $this->info[$var] : '';
+        $this->setData($properties);
     }
 
     public function __sleep() {
-        return Array('connection', 'info');
+        return Array('connection', 'readonly');
     }
 
     public function update($property, $value) {
@@ -85,6 +76,30 @@ class Calendar {
      * @return gClient\Calendar\EventComposite ?
      */
     public function getEvents(DateTime $from = null, DateTime $to = null) {
+        $req = $this->prepareCall($this->eventFeedLink)->method('GET');
+
+        $res  = $req->request();
+        $data = json_decode($res->getContent(), true);
+
+        $events = Array();
+        foreach ($data['data']['items'] as $i => $edata) {
+            $events[] = new Event($edata, $this->connection);
+        }
+
+        return $events;
+    }
+
+    public function createEvent(DateTime $start, DateTime $end) {
+    }
+
+    public function createAllDayEvent(DateTime $date) {
+    }
+
+    /**
+     * @param Event|string Event instance or ID of the event to delete from this calendar
+     * @throws \gClient\HTTP\Exception
+     */
+    public function deleteEvent($event) {
     }
 
     /**

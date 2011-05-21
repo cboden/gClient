@@ -20,32 +20,16 @@ namespace gClient\Calendar;
  * @property string $weather (C|F) if the user selected a local weather calendar
  * @property int $weekStart (0|1|6) translates to (Sunday|Monday|Saturday)
  */
-class Settings {
-    /**
-     * Raw data sent back from Google
-     */
-    protected $data;
-
-    /**
-     * Individual parsed settings given through __get
-     * @var Array
-     */
-    protected $settings = Array();
-
+class Settings extends \gClient\PropertyProxy {
     public function __construct(\gClient\HTTP\ResponseInterface $response) {
         $data = json_decode($response->getContent(), true);
-        $this->data = $data['data'];
 
-        foreach ($data['data']['items'] as $i => $contents) {
-            $this->settings[$contents['id']] = $contents['value'];
-        }
-    }
-
-    public function &__get($name) {
-        if (!isset($this->settings[$name])) {
-            $this->settings[$name] = '';
+        // might need to save the URLs
+        $props = Array();
+        foreach ($data['data']['items'] as $i => &$sdata) {
+            $props[$sdata['id']] = $sdata['value'];
         }
 
-        return $this->settings[$name];
+        $this->setData($props);
     }
 }

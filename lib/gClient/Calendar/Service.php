@@ -18,12 +18,7 @@ use SplDoublyLinkedList, Closure;
  * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html Calendar API Protocol documentation
  * @link http://code.google.com/apis/calendar/data/2.0/reference.html Calendar property reference
  */
-class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countable {
-    /**
-     * @internal
-     */
-    protected $readonly = Array();
-
+class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterface, \SeekableIterator, \Countable {
     const CLIENTLOGIN_SERVICE = 'cl';
     const OAUTH_SCOPE         = 'https://www.google.com/calendar/feeds/';
 
@@ -210,7 +205,11 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
      * @todo allow $position to be unique_id
      */
     public function seek($position) {
-        $this->pos = $pos;
+        if (!is_integer($position)) {
+            $position = array_search($position, $this->lookup);
+        }
+
+        $this->pos = $position;
 
         if (!$this->valid()) {
             throw new OutOfBoundsException('Invalid index');
@@ -253,22 +252,7 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
             return;
         }
 
-        $this->readonly['settings'] = new Settings($this->prepareCall(static::SETTINGS_URL)->request());
-    }
-
-    /**
-     * @internal
-     */
-    public function &__get($name) {
-        if ($name == 'settings') {
-            $this->fetchSettings();
-        }
-
-        if (!isset($this->readonly[$name])) {
-            $this->readonly[$name] = '';
-        }
-
-        return $this->readonly[$name];
+        $this->setData(Array('settings' => new Settings($this->prepareCall(static::SETTINGS_URL)->request())));
     }
 
     /**
