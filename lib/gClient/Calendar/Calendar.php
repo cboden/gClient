@@ -5,7 +5,8 @@ use gClient\Calendar\Service;
 use DateTime;
 
 /**
- * @property string $id The unique ID of the calendar
+ * @property string $unique_id The unique (Google wide) ID of the calendar
+ * @property string $id The URL ID of the calendar
  * @property string $title Display name of the calendar
  * @property string $details
  * @property string $kind
@@ -56,9 +57,11 @@ class Calendar {
      * @param gClient\Auth\Adapter|NULL Authenticated account to use or null for an anonymouse (read-only) connection
      * @todo Change $catalog_data to mixed - URL to fetch, Array if from Catalog
      */
-    public function __construct(Array $catalog_data, Connection $connection) {
+    public function __construct(Array $properties, Connection $connection) {
+        $properties['unique_id'] = substr($properties['id'], strrpos($properties['id'], '/') + 1);
+
         $this->connection = $connection;
-        $this->info       = $catalog_data;
+        $this->info       = $properties;
     }
 
     public function __get($var) {

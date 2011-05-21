@@ -99,13 +99,7 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
         }
 
         $data = json_decode($res->getContent(), true);
-        $this->data[] = $data['data'];
-
-        end($this->data);
-        $key = key($this->data);
-
-        $this->calendars[$key] = new Calendar($data['data'], $this->connection);
-        return $this->calendars[$key];
+        return $this->appendCalendar($data['data']);
     }
 
     /**
@@ -151,16 +145,25 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
         $res = $this->prepareCall(static::ALL_LIST_URL)->method('POST')->setRawData(Array('data' => Array('id' => $id)))->request();
 
         $data = json_decode($res->getContent(), true);
-        $this->data[] = $data['data'];
-
-        end($this->data);
-        $key = key($this->data);
-
-        $this->calendars[$key] = new Calendar($data['data'], $this->connection);
-        return $this->calendars[$key];
+        return $this->appendCalendar($data['data']);
     }
 
     public function unsubscribeFromCalendar($id) {
+    }
+
+    /**
+     * @param Array
+     * @return Calendar
+     */
+    protected function appendCalendar($data) {
+        array_push($this->data['items'], $data);
+
+        end($this->data['items']);
+        $key = key($this->data['items']);
+
+        $this->calendars[$key] = new Calendar($data, $this->connection);
+
+        return $this->calendars[$key];
     }
 
     /**
