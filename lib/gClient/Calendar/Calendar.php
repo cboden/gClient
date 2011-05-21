@@ -1,6 +1,7 @@
 <?php
 namespace gClient\Calendar;
 use gClient\Connection;
+use gClient\Calendar\Service;
 use DateTime;
 
 /**
@@ -16,7 +17,7 @@ use DateTime;
  * @property string $selfLink
  * @property int $canEdit
  * @property Array $author
- * @property string $accessLevel
+ * @property string $accessLevel none | read | freebusy | editor | owner | root
  * @property string $color
  * @property string $hidden
  * @property string $location
@@ -55,13 +56,9 @@ class Calendar {
      * @param gClient\Auth\Adapter|NULL Authenticated account to use or null for an anonymouse (read-only) connection
      * @todo Change $catalog_data to mixed - URL to fetch, Array if from Catalog
      */
-    public function __construct(Array $catalog_data, Connection $connection = null) {
-        if (is_null($connection)) {
-            $connection = new Auth\Anonymous();
-        }
+    public function __construct(Array $catalog_data, Connection $connection) {
         $this->connection = $connection;
-
-        $this->info = $catalog_data;
+        $this->info       = $catalog_data;
     }
 
     public function __get($var) {
@@ -72,6 +69,12 @@ class Calendar {
         return Array('connection', 'info');
     }
 
+    public function update($property, $value) {
+        $own_url = str_replace(Service::ALL_LIST_URL, Service::OWNER_LIST_URL, $this->selfLink);
+        $res = $this->prepareCall($own_url)->method('PUT')->setRawData(Array('data' => Array($property => $value)))->request();
+        $this->info[$property] = $value;
+    }
+
     /**
      * Fetch the scheduled events from this calendar between a specified dates
      * @param DateTime|NULL Start time or current time if NULL
@@ -79,5 +82,17 @@ class Calendar {
      * @return gClient\Calendar\EventComposite ?
      */
     public function getEvents(DateTime $from = null, DateTime $to = null) {
+    }
+
+    /**
+     * Create an HTTP request class
+     * @param string The URL to request
+     * @throws \RuntimeException If class $this->client does not implement \gClient\HTTP\ClientInterface
+     * @throws \gClient\HTTP\Exception If the server returns a status code of 300 or greater
+     * @throws \UnexpectedValueException If an invalid HTTP Method was set
+     * @return \gClient\HTTP\ResponseInterface Instance of previously set requestor class
+     */
+    public function prepareCall($url) {
+        return $this->connection->prepareCall($url)->addHeader(Service::PROTOCOL_VERSION)->addHeader('Content-Type: ' . Service::CONTENT_TYPE)->setParameter('alt', Service::ALT);
     }
 }

@@ -121,7 +121,8 @@ class Client implements CI {
                 $this->opts[CURLOPT_POSTFIELDS] = $this->params;
                 break;
             case 'PUT':
-                $this->opts[CURLOPT_POSTFIELDS] = http_build_query($this->params, null, '&');
+                //$this->opts[CURLOPT_POSTFIELDS] = http_build_query($this->params, null, '&');
+                $this->opts[CURLOPT_POSTFIELDS] = $this->params;
                 $this->addHeader('Content-Length: ' . strlen($this->opts[CURLOPT_POSTFIELDS]));
                 $this->opts[CURLOPT_CUSTOMREQUEST] = 'PUT';
                 break;

@@ -47,9 +47,17 @@ class Response implements RI {
                 break;
             }
 
+            // In case the Location header was a relative URI
+            if (!(boolean)filter_var($loc, FILTER_VALIDATE_URL)) {
+                $parts    = parse_url($this->xfer_info['url']);
+                $relative = substr($parts['path'], 0, strrpos($parts['path'], '/'));
+                $loc      = $parts['scheme'] . '://' . $parts['host'] . $relative . '/' . $loc;
+            }
+
             curl_setopt($req, CURLOPT_URL, $loc);
         } while ($i <= 5);
 
+        // Don't want to throw an Exception - want HTTP info for debugging purposes
         $code = $this->getStatusCode();
         if ($i == 6 && $code >= 300 && $code <= 399) {
             $this->content = 'Too many redirects';
