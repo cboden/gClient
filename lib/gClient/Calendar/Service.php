@@ -12,7 +12,7 @@ use SplDoublyLinkedList, Closure;
 
 /**
  * This is the main Calendar controlling class
- * It's class name is subject to change before 1.0
+ * It's class name is subject to change before 1.0 - I'm not stuck on it being an Iterator (::getCalendars() instead maybe)
  * 
  * @property Settings $settings A settings object of the Connection users' Google Calendar Settings
  * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html Calendar API Protocol documentation
@@ -31,10 +31,10 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
     const CONTENT_TYPE     = 'application/json';
     const ALT              = 'jsonc';
 
-    const ALL_LIST_URL   = '/calendar/feeds/default/allcalendars/full';
-    const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full';
+    const ALL_LIST_URL   = '/calendar/feeds/default/allcalendars/full/';
+    const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full/';
 
-    const SETTINGS_URL = '/calendar/feeds/default/settings';
+    const SETTINGS_URL = '/calendar/feeds/default/settings/';
 
     /**
      * Connection to use to make HTTP calls with
@@ -46,7 +46,7 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
      * Calendar data list returned from Google
      * @var Array
      */
-    protected $data;
+    protected $data = Array();
 
     /**
      * Array of Calendar objects (cache)
@@ -73,46 +73,13 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
     }
 
     /**
-     * @internal
-     */
-    public function &__get($name) {
-        if ($name == 'settings') {
-            $this->fetchSettings();
-        }
-
-        if (!isset($this->readonly[$name])) {
-            $this->readonly[$name] = '';
-        }
-
-        return $this->readonly[$name];
-    }
-
-    /**
-     * Create an HTTP request class
-     * @param string The URL to request
-     * @throws \RuntimeException If class $this->client does not implement \gClient\HTTP\ClientInterface
-     * @throws \gClient\HTTP\Exception If the server returns a status code of 300 or greater
-     * @throws \UnexpectedValueException If an invalid HTTP Method was set
-     * @return \gClient\HTTP\ResponseInterface Instance of previously set requestor class
-     */
-    public function prepareCall($url) {
-        return $this->connection->prepareCall($url)->addHeader(static::PROTOCOL_VERSION)->addHeader('Content-Type: ' . static::CONTENT_TYPE)->setParameter('alt', static::ALT);
-    }
-
-    public static function getClientLoginService() {
-        return static::CLIENTLOGIN_SERVICE;
-    }
-
-    public static function getOAuthScope() {
-        return static::OAUTH_SCOPE;
-    }
-
-    /**
      * @param string $name Name of calendar to create
-     * @param Array Additional configuration array of data for creating the calendar
+     * @param Array Additional creational params - associative keys: (details, timeZone, hidden, color, location)
      * @return Calendar
      * @throws \UnexpectedValueException On an empty name/title or invalid color
      * @throws \gClient\HTTP\Exception On a bad return from Google
+     * @todo This appends to end of all calendars - should append to end of owner calendars
+     * @todo Consider setting timeZone from Settings if not set in $attributes
      */
     public function createCalendar($name = null, Array $attributes = Array()) {
         // I'm still on the fence of which wasy this should be...currently $attributes['title'] wins...
@@ -143,7 +110,7 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
 
     /**
      * @param Calendar|string ID of the calendar to delete
-     * @return boolean
+     * @return Service $this
      * @throws \gClient\HTTP\Exception
      */
     public function deleteCalendar($calendar) {
@@ -152,24 +119,48 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
             $url = $calendar->selfLink;
         }
 
-        $res = $this->prepareCall($url)->method('DELETE')->request();
+        $own_url = str_replace(static::ALL_LIST_URL, static::OWNER_LIST_URL, $url);
+
+        $res = $this->prepareCall($own_url)->method('DELETE')->request();
         if ($res->getStatusCode() != 200) {
             throw new HTTP\Exception($res);
         }
 
-        // remove internal pointers
+        $pos = 0;
+        foreach ($this->data['items'] as $i => $info) {
+            if ($info['selfLink'] == $url) {
+                $pos = $i;
+                break;
+            }
+        }
 
-        return true;
+        array_splice($this->data['items'], $pos, 1);
+        if (isset($this->calendars[$pos])) {
+            array_splice($this->calendars, $pos, 1);
+        }
+
+        return $this;
     }
 
     /**
-     * @param string ID-URL of calendar to subscribe to
+     * Subscribe to a calendar
+     * @param string ID of calendar to subscribe to
      * @return Calendar
      */
-    public function subscribeToCalendar($id_url) {
+    public function subscribeToCalendar($id) {
+        $res = $this->prepareCall(static::ALL_LIST_URL)->method('POST')->setRawData(Array('data' => Array('id' => $id)))->request();
+
+        $data = json_decode($res->getContent(), true);
+        $this->data[] = $data['data'];
+
+        end($this->data);
+        $key = key($this->data);
+
+        $this->calendars[$key] = new Calendar($data['data'], $this->connection);
+        return $this->calendars[$key];
     }
 
-    public function unsubscribeFromCalendar() {
+    public function unsubscribeFromCalendar($id) {
     }
 
     /**
@@ -231,5 +222,40 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
         }
 
         $this->readonly['settings'] = new Settings($this->prepareCall(static::SETTINGS_URL)->request());
+    }
+
+    /**
+     * @internal
+     */
+    public function &__get($name) {
+        if ($name == 'settings') {
+            $this->fetchSettings();
+        }
+
+        if (!isset($this->readonly[$name])) {
+            $this->readonly[$name] = '';
+        }
+
+        return $this->readonly[$name];
+    }
+
+    /**
+     * Create an HTTP request class
+     * @param string The URL to request
+     * @throws \RuntimeException If class $this->client does not implement \gClient\HTTP\ClientInterface
+     * @throws \gClient\HTTP\Exception If the server returns a status code of 300 or greater
+     * @throws \UnexpectedValueException If an invalid HTTP Method was set
+     * @return \gClient\HTTP\ResponseInterface Instance of previously set requestor class
+     */
+    public function prepareCall($url) {
+        return $this->connection->prepareCall($url)->addHeader(static::PROTOCOL_VERSION)->addHeader('Content-Type: ' . static::CONTENT_TYPE)->setParameter('alt', static::ALT);
+    }
+
+    public static function getClientLoginService() {
+        return static::CLIENTLOGIN_SERVICE;
+    }
+
+    public static function getOAuthScope() {
+        return static::OAUTH_SCOPE;
     }
 }
