@@ -55,6 +55,11 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
     protected $calendars = Array();
 
     /**
+     * @internal
+     */
+    protected $lookup = Array();
+
+    /**
      * Internal pointer for looping through Calendar objects
      * @var int
      */
@@ -69,6 +74,15 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
 
         $response = $this->prepareCall(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
         $data = json_decode($response->getContent(), true);
+
+        foreach ($data['data']['items'] as $i => $caldata) {
+            $calendar = new Calendar($caldata, $connection);
+
+            $this->calendars[$calendar->unique_id] = $calendar;
+            $this->lookup[] = $calendar->unique_id;
+        }
+
+        unset($data['data']['items']);
         $this->data = $data['data'];
     }
 
@@ -78,7 +92,7 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
      * @return Calendar
      * @throws \UnexpectedValueException On an empty name/title or invalid color
      * @throws \gClient\HTTP\Exception On a bad return from Google
-     * @todo This appends to end of all calendars - should append to end of owner calendars
+     * @todo This appends to end of all calendars - should append to end of owner calendars - including alphabetical order
      * @todo Consider setting timeZone from Settings if not set in $attributes
      */
     public function createCalendar($name = null, Array $attributes = Array()) {
@@ -103,7 +117,7 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
     }
 
     /**
-     * @param Calendar|string ID of the calendar to delete
+     * @param Calendar|string The Calendar instance, selfLink or unique_id of the calendar to delete
      * @return Service $this
      * @throws \gClient\HTTP\Exception
      */
@@ -115,23 +129,19 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
 
         $own_url = str_replace(static::ALL_LIST_URL, static::OWNER_LIST_URL, $url);
 
+        if (!(boolean)filter_var($own_url, FILTER_VALIDATE_URL)) {
+            $own_url = static::OWNER_LIST_URL . $url;
+        }
+
         $res = $this->prepareCall($own_url)->method('DELETE')->request();
         if ($res->getStatusCode() != 200) {
             throw new HTTP\Exception($res);
         }
 
-        $pos = 0;
-        foreach ($this->data['items'] as $i => $info) {
-            if ($info['selfLink'] == $url) {
-                $pos = $i;
-                break;
-            }
-        }
+        $uid = substr($own_url, strrpos($own_url, '/') + 1);
 
-        array_splice($this->data['items'], $pos, 1);
-        if (isset($this->calendars[$pos])) {
-            array_splice($this->calendars, $pos, 1);
-        }
+        unset($this->calendars[$uid]);
+        array_splice($this->lookup, array_search($uid, $this->lookup), 1);
 
         return $this;
     }
@@ -148,7 +158,31 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
         return $this->appendCalendar($data['data']);
     }
 
-    public function unsubscribeFromCalendar($id) {
+    /**
+     * @param \gData\Calendar\Calendar|string The instance of Calendar to delete or the unique_id of the calendar
+     * @throws \gClient\HTTP\Exception
+     * @return Service $this
+     */
+    public function unsubscribeFromCalendar($calendar) {
+        $url = $calendar;
+        if ($calendar instanceof Calendar) {
+            $url = static::ALL_LIST_URL . $calendar->unique_id;
+        }
+
+        if (!(boolean)filter_var($url, FILTER_VALIDATE_URL)) {
+            $url = static::ALL_LIST_URL . $url;
+        }
+
+        $this->prepareCall($url)->method('DELETE')->request();
+
+        $uid = substr($url, strrpos($url, '/') + 1);
+
+        if (isset($this->calendars[$uid])) {
+            unset($this->calendars[$uid]);
+            array_splice($this->lookup, array_search($uid, $this->lookup), 1);
+        }
+
+        return $this;
     }
 
     /**
@@ -156,25 +190,24 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
      * @return Calendar
      */
     protected function appendCalendar($data) {
-        array_push($this->data['items'], $data);
+        $calendar = new Calendar($data, $this->connection);
 
-        end($this->data['items']);
-        $key = key($this->data['items']);
+        $this->calendars[$calendar->unique_id] = $calendar;
+        $this->lookup[] = $calendar;
 
-        $this->calendars[$key] = new Calendar($data, $this->connection);
-
-        return $this->calendars[$key];
+        return $calendar;
     }
 
     /**
      * @return int
      */
     public function count() {
-        return count($this->data['items']);
+        return count($this->calendars);
     }
 
     /**
      * @param int|string
+     * @todo allow $position to be unique_id
      */
     public function seek($position) {
         $this->pos = $pos;
@@ -190,11 +223,7 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
      * @return Calendar
      */
     public function current() {
-        if (!isset($this->calendars[$this->pos])) {
-            $this->calendars[$this->pos] = new Calendar($this->data['items'][$this->pos], $this->connection);
-        }
-
-        return $this->calendars[$this->pos];
+        return $this->calendars[$this->lookup[$this->pos]];
     }
 
     /**
@@ -216,7 +245,7 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
      * @return bool
      */
     public function valid() {
-        return isset($this->data['items'][$this->pos]);
+        return isset($this->lookup[$this->pos]);
     }
 
     protected function fetchSettings() {
