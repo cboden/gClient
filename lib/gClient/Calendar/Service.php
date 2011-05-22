@@ -260,6 +260,14 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
         $this->setData(Array('settings' => new Settings($this->prepareCall(static::SETTINGS_URL)->request())));
     }
 
+    public function &__get($name) {
+        if ($name == 'settings') {
+            $this->fetchSettings();
+        }
+
+        return parent::__get($name);
+    }
+
     /**
      * Create an HTTP request class
      * @param string The URL to request

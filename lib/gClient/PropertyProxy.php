@@ -9,10 +9,6 @@ class PropertyProxy {
     }
 
     public function &__get($name) {
-        if ($name == 'settings') {
-            $this->fetchSettings();
-        }
-
         if (!isset($this->readonly[$name])) {
             $this->readonly[$name] = '';
         }
