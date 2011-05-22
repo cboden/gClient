@@ -134,9 +134,7 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
         }
 
         $uid = substr($own_url, strrpos($own_url, '/') + 1);
-
-        unset($this->calendars[$uid]);
-        array_splice($this->lookup, array_search($uid, $this->lookup), 1);
+        $this->removeCalendar($uid);
 
         return $this;
     }
@@ -171,11 +169,7 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
         $this->prepareCall($url)->method('DELETE')->request();
 
         $uid = substr($url, strrpos($url, '/') + 1);
-
-        if (isset($this->calendars[$uid])) {
-            unset($this->calendars[$uid]);
-            array_splice($this->lookup, array_search($uid, $this->lookup), 1);
-        }
+        $this->removeCalendar($uid);
 
         return $this;
     }
@@ -191,6 +185,17 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
         $this->lookup[] = $calendar->unique_id;
 
         return $calendar;
+    }
+
+    protected function removeCalendar($id) {
+        $pos = array_search($id, $this->lookup);
+
+        unset($this->calendars[$id]);
+        array_splice($this->lookup, $pos, 1);
+
+        if ($pos == $this->pos && $pos > 0) {
+            $this->pos--;
+        }
     }
 
     /**
