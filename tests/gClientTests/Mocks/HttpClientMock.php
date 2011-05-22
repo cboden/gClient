@@ -37,6 +37,6 @@ class HttpClientMock implements ClientInterface {
     }
 
     public function request() {
-        
+        return new HttpResponseMock($this);
     }
 }

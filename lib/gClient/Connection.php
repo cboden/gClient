@@ -118,8 +118,13 @@ class Connection {
             if (!class_exists($class)) {
                 throw new \RuntimeException("{$name} is not a valid service");
             }
-        } else if (!($class instanceof \gClient\ServiceInterface)) {
-            throw new \UnexpectedValueException('Service must be an implementation of \\gClient\\ServiceInterface');
+        } else {
+            if (class_exists('\ReflectionClass', false)) {
+                $reflection = new \ReflectionClass($class);
+                if (!$reflection->implementsInterface('\gClient\ServiceInterface')) {
+                    throw new \UnexpectedValueException('Service must be an implementation of \\gClient\\ServiceInterface');
+                }
+            }
         }
 
         return $class;
