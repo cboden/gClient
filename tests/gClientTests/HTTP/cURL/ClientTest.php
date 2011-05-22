@@ -2,6 +2,9 @@
 namespace gClientTests\HTTP\cURL;
 use gClient\HTTP\cURL;
 
+/**
+ * @covers \gClient\HTTP\cURL\Client
+ */
 class ClientTest extends \PHPUnit_Framework_TestCase {
     protected $_client;
 
@@ -9,16 +12,19 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         $this->_client = new cURL\Client('http://localhost');
     }
 
-    public function testInterface() {
-        $this->assertType('\gClient\HTTP\ClientInterface', $this->_client);
+    public function testClientInterface() {
+        $this->assertInstanceOf('\gClient\HTTP\ClientInterface', $this->_client);
     }
 
-    public function testInvalidURL() {
+    public function testInvalidUrlException() {
         $this->setExpectedException('\InvalidArgumentException');
         new cURL\Client('invalid url');
     }
 
-    public function testMethods() {
+    /**
+     * @covers \gClient\HTTP\cURL\Client::method
+     */
+    public function testMethodSuccess() {
         try {
             $this->_client->method('GET');
             $this->_client->method('POST');
@@ -27,7 +33,39 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         } catch (\Exception $e) {
             $this->fail("Client::method threw an exception on GET|POST|PUT|DELETE ({$e->getMessage()})");
         }
+    }
 
+    /**
+     * @depends testMethodSuccess
+     */
+    public function testVerifyMethodSet() {
+        $this->_client->method('POST');
+        $this->assertEquals('POST', $this->readAttribute($this->_client, 'method'));
+    }
+
+    /**
+     * @covers \gClient\
+     * @dataProvider providerRawData
+     */
+    public function testSetRawData($string) {
+        $this->_client->setRawData($string);
+        if (is_array($string)) {
+            $string = json_encode($string);
+        }
+        $this->assertEquals($string, $this->readAttribute($this->_client, 'params'));
+    }
+
+    public function providerRawData() {
+        return Array(
+            Array('Hello World!')
+          , Array(Array('Hello' => 'World'))
+        );
+    }
+
+    /**
+     * @depends testVerifyMethodSet
+     */
+    public function testInvalidMethod() {
         $this->setExpectedException('\Exception');
         $this->_client->method('invalid method');
     }
