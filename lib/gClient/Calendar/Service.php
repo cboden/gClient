@@ -188,7 +188,7 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
         $calendar = new Calendar($data, $this->connection);
 
         $this->calendars[$calendar->unique_id] = $calendar;
-        $this->lookup[] = $calendar;
+        $this->lookup[] = $calendar->unique_id;
 
         return $calendar;
     }
