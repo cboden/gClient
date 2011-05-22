@@ -1,13 +1,14 @@
 <?php
 namespace gClientTests\Calendar\TestAssets;
-use gclient\Auth\Adapter as A;
 use gClient\Calendar;
 
 class GoogleServer {
     protected $_url_lookup = Array();
 
     public function __construct() {
-        $this->_url_lookup[Calendar\Catalog::SETTINGS_URL] = 'settings';
+        $this->_url_lookup[Calendar\Service::ALL_LIST_URL]   = 'all_calendars';
+        $this->_url_lookup[Calendar\Service::OWNER_LIST_URL] = 'own_calendars';
+        $this->_url_lookup[Calendar\Service::SETTINGS_URL]   = 'settings';
     }
 
     public function __call($url, $params) {

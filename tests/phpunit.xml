@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="./bootstrap.php" colors="true" backupGlobals="false" backupStaticAttributes="false" syntaxCheck="false">
+<phpunit forceCoversAnnotation="true" mapTestClassNameToCoveredClassName="true" bootstrap="./bootstrap.php" colors="true" backupGlobals="false" backupStaticAttributes="false" syntaxCheck="false">
+<!--
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">../lib/gClient</directory>
+        </whitelist>
+    </filter>
+-->
     <testsuites>
         <testsuite name="gClient">
-            <directory>./</directory>
+            <directory>gClientTests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

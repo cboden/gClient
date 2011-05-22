@@ -40,26 +40,35 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
      */
     public function testVerifyMethodSet() {
         $this->_client->method('POST');
-        $this->assertEquals('POST', $this->readAttribute($this->_client, 'method'));
+        $this->assertAttributeEquals('POST', 'method', $this->_client);
     }
 
     /**
-     * @covers \gClient\
-     * @dataProvider providerRawData
+     * @covers \gClient\HTTP\cURL\Client::setRawData
      */
-    public function testSetRawData($string) {
+    public function testSetRawData() {
+        $string = 'Hello World!';
+
         $this->_client->setRawData($string);
-        if (is_array($string)) {
-            $string = json_encode($string);
-        }
-        $this->assertEquals($string, $this->readAttribute($this->_client, 'params'));
+        $this->assertAttributeEquals($string, 'params', $this->_client);
     }
 
-    public function providerRawData() {
-        return Array(
-            Array('Hello World!')
-          , Array(Array('Hello' => 'World'))
-        );
+    public function testSetRawDataWithArray() {
+        $array  = Array('data' => Array('Hello' => 'World'));
+        $string = json_encode($array);
+
+        $this->_client->setRawData($array);
+        $this->assertAttributeEquals($string, 'params', $this->_client);
+    }
+
+    /**
+     * @covers \gClient\HTTP\cURL\Client::setParameter
+     */
+    public function testSetParameter() {
+        list($key, $val) = Array('Hello', 'World');
+
+        $this->_client->setParameter($key, $val);
+        $this->assertAttributeEquals(Array($key => $val), 'params', $this->_client);
     }
 
     /**
