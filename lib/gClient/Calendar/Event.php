@@ -29,7 +29,7 @@ class Event extends \gClient\PropertyProxy {
     protected $connection;
 
     public function __construct(Array $data, \gClient\Connection $connection) {
-        $this->connection = $connection;
+//        $this->connection = $connection;
         $this->setData($data);
     }
 }

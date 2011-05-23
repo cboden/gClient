@@ -71,14 +71,15 @@ class Calendar extends \gClient\PropertyProxy {
 
     /**
      * Fetch the scheduled events from this calendar between a specified dates
-     * @param DateTime|NULL Start time or current time if NULL
-     * @param DateTime|NULL End time or all future events if NULL
+     * @param EventSelector|NULL Set the parameters of which events to fetch
      * @return gClient\Calendar\EventComposite ?
      */
-    public function getEvents(DateTime $from = null, DateTime $to = null) {
-        $req = $this->prepareCall($this->eventFeedLink)->method('GET');
+    public function getEvents(EventSelector $query = null) {
+        if ($query === null) {
+            $query = new EventSelector\AllFuture();
+        }
 
-        $res  = $req->request();
+        $res = $this->prepareCall($this->eventFeedLink)->method('GET')->setParameters($query->params)->request();
         $data = json_decode($res->getContent(), true);
 
         $events = Array();
