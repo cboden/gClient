@@ -1,11 +1,36 @@
 #gClient (Calendar)
 
-A fully PSR-0 compliant, RESTful PHP client for Google Calendar API 2.0
-The goal is to make this API intuitive without requiring knowledge of the gData API
+A fully PSR-0 compliant, RESTful PHP client for Google Calendar API 2.0.  
+The goal is to make this API intuitive without requiring knowledge of the gData API.  
 
-If Calendar works out more Apps API clients can be created
+If Calendar works out more Apps API clients can be created (Contacts, URL Shortener, etc.)
 
-##Quick Username/Password test
+---
+
+### Completed functionality
+* Abstract HTTP client interface
+* cURL HTTP client implementation
+* ClientLogin Authentication (username/password)
+* OAuth2 Authentication
+* Get user's Google Calendar Application settings
+* Retreive calendars
+* Create/Delete/Subscribe/Unsubscribe calendars
+* Read/write a calendar's properties
+* Query raw event data
+
+### ToDo
+* Convert received string data to native data types
+* Unify object creation
+* Plan/write Event objects and interaction between Calendars
+* Better and more unit testing
+* Consider simplifying Service interactions (refactor create/subscribe, delete/unsubscribe)
+* Sort Service calendars to match server (owned, subscriptions, alphabetical)
+* Better exceptions
+
+---
+
+##Quick ClientLogin test
+
 (a better test coming soon, Calendar\Service is about to get overhauled)
 
     <?php
