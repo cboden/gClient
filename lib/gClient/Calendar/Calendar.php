@@ -8,8 +8,8 @@ use DateTime;
  * A Calendar class represents an individual calendar within Google, containing properties and events
  * @property string $unique_id The unique (Google wide) ID of the calendar
  * @property string $id The URL ID of the calendar
- * @property string $title Display name of the calendar
- * @property string $details
+ * @property-write string $title Display name of the calendar
+ * @property-write string $details
  * @property string $kind
  * @property string $etag
  * @property string $created
@@ -20,11 +20,11 @@ use DateTime;
  * @property int $canEdit
  * @property Array $author
  * @property string $accessLevel none | read | freebusy | editor | owner | root
- * @property string $color
- * @property string $hidden
- * @property string $location
- * @property string $selected
- * @property string $timeZone
+ * @property-write string $color
+ * @property-write string $hidden
+ * @property-write string $location
+ * @property-write string $selected
+ * @property-write string $timeZone
  * @property int $timesCleaned
  */
 class Calendar extends \gClient\PropertyProxy {
@@ -63,6 +63,12 @@ class Calendar extends \gClient\PropertyProxy {
         return Array('connection', 'readonly');
     }
 
+    /**
+     * Update one of the properties of this class
+     * @param string Property name to udpate
+     * @param string Value of property to update to
+     * @throws \gClient\HTTP\Exception
+     */
     public function update($property, $value) {
         $own_url = str_replace(Service::ALL_LIST_URL, Service::OWNER_LIST_URL, $this->selfLink);
         $res = $this->prepareCall($own_url)->method('PUT')->setRawData(Array('data' => Array($property => $value)))->request();
@@ -72,7 +78,8 @@ class Calendar extends \gClient\PropertyProxy {
     /**
      * Fetch the scheduled events from this calendar between a specified dates
      * @param EventSelector|NULL Set the parameters of which events to fetch
-     * @return gClient\Calendar\EventComposite ?
+     * @throws /gClient\HTTP\Exception
+     * @return \SplFixedArray of Event
      */
     public function getEvents(EventSelector $query = null) {
         if ($query === null) {
@@ -82,17 +89,28 @@ class Calendar extends \gClient\PropertyProxy {
         $res = $this->prepareCall($this->eventFeedLink)->method('GET')->setParameters($query->params)->request();
         $data = json_decode($res->getContent(), true);
 
-        $events = Array();
+        if (!isset($data['data']['items'])) {
+            return new \SplFixedArray(0);
+        }
+
+        $events = new \SplFixedArray(count($data['data']['items']));
         foreach ($data['data']['items'] as $i => $edata) {
-            $events[] = new Event($edata, $this->connection);
+            $events[$i] = new Event($edata, $this->connection);
         }
 
         return $events;
     }
 
-    public function createEvent(DateTime $start, DateTime $end) {
+    /**
+     * @param Event|string Either a Event with all the set parameters or a string to parse as an event ex. "Squash with Chris tomorrow at noon"
+     * @return Event
+     */
+    public function createEvent($event) {
     }
 
+    /**
+     * @deprecated possibly
+     */
     public function createAllDayEvent(DateTime $date) {
     }
 
