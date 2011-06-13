@@ -2,13 +2,6 @@
 namespace gClient\Calendar;
 use gClient\Connection;
 use gClient\HTTP;
-use SplDoublyLinkedList, Closure;
-
-// maybe to list generation on construct
-// Catalog, Listing, Library, Directory
-// Manager, Cabnet, Composite, ???
-
-// new SplPriorityQueue
 
 /**
  * This is the main Calendar controlling class
@@ -31,17 +24,16 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
 
     const SETTINGS_URL = '/calendar/feeds/default/settings/';
 
+    const IT_MODE_FIFO = 0;
+    const IT_MODE_FILO = 1;
+    const IT_MODE_OWN  = 2;
+    const IT_MODE_ALL  = 4;
+
     /**
      * Connection to use to make HTTP calls with
      * @var \gClient\Connection
      */
     protected $connection;
-
-    /**
-     * Calendar data list returned from Google
-     * @var Array
-     */
-    protected $data = Array();
 
     /**
      * Array of Calendar objects (cache)
@@ -71,14 +63,17 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
         $data = json_decode($response->getContent(), true);
 
         foreach ($data['data']['items'] as $i => $caldata) {
-            $calendar = new Calendar($caldata, $connection);
-
-            $this->calendars[$calendar->unique_id] = $calendar;
-            $this->lookup[] = $calendar->unique_id;
+            $this->insertCalendar($caldata);
         }
+    }
 
-        unset($data['data']['items']);
-        $this->data = $data['data'];
+    /**
+     * @todo
+     * Boolean operator
+     * Owner calendars - all calendars
+     * Forward/reverse
+     */
+    public function setIteratorMode($mode) {
     }
 
     /**
@@ -108,7 +103,7 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
         }
 
         $data = json_decode($res->getContent(), true);
-        return $this->appendCalendar($data['data']);
+        return $this->insertCalendar($data['data']);
     }
 
     /**
@@ -148,7 +143,7 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
         $res = $this->prepareCall(static::ALL_LIST_URL)->method('POST')->setRawData(Array('data' => Array('id' => $id)))->request();
 
         $data = json_decode($res->getContent(), true);
-        return $this->appendCalendar($data['data']);
+        return $this->insertCalendar($data['data']);
     }
 
     /**
@@ -175,16 +170,39 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
     }
 
     /**
-     * @param Array
-     * @return Calendar
+     * 
      */
-    protected function appendCalendar($data) {
+    protected function insertCalendar(Array $data) {
         $calendar = new Calendar($data, $this->connection);
 
         $this->calendars[$calendar->unique_id] = $calendar;
-        $this->lookup[] = $calendar->unique_id;
 
+        foreach ($this->lookup as $i => &$id) {
+            if (1 === $this->compare($calendar, $this->calendars[$id])) {
+                array_splice($this->lookup, $i, 0, $calendar->unique_id);
+                return $calendar;
+            }
+        }
+
+        array_push($this->lookup, $calendar->unique_id);
         return $calendar;
+    }
+
+    /**
+     * 
+     */
+    public function compare(Calendar $c1, Calendar $c2) {
+        if ($c1->accessLevel != $c2->accessLevel) {
+            if ($c1->accessLevel == 'owner') {
+                return 1;
+            }
+
+            if ($c2->accessLevel == 'owner') {
+                return -1;
+            }
+        }
+
+        return ($c1->title < $c2->title ? 1 : -1);
     }
 
     protected function removeCalendar($id) {
@@ -206,8 +224,7 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
     }
 
     /**
-     * @param int|string
-     * @todo allow $position to be unique_id
+     * @param int|string The index or unique_id of the calendar to seek to
      */
     public function seek($position) {
         if (!is_integer($position)) {
@@ -219,8 +236,6 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
         if (!$this->valid()) {
             throw new OutOfBoundsException('Invalid index');
         }
-
-        return $this->current();
     }
 
     /**
