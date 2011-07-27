@@ -12,9 +12,6 @@ use gClient\HTTP;
  * @link http://code.google.com/apis/calendar/data/2.0/reference.html Calendar property reference
  */
 class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countable {
-    const CLIENTLOGIN_SERVICE = 'cl';
-    const OAUTH_SCOPE         = 'https://www.google.com/calendar/feeds/';
-
     const PROTOCOL_VERSION = 'GData-Version: 2';
     const CONTENT_TYPE     = 'application/json';
     const ALT              = 'jsonc';
@@ -295,10 +292,10 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
     }
 
     public static function getClientLoginService() {
-        return static::CLIENTLOGIN_SERVICE;
+        return 'cl';
     }
 
     public static function getOAuthScope() {
-        return static::OAUTH_SCOPE;
+        return 'https://www.google.com/calendar/feeds/';
     }
 }
