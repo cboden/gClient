@@ -11,7 +11,7 @@ use gClient\HTTP;
  * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html Calendar API Protocol documentation
  * @link http://code.google.com/apis/calendar/data/2.0/reference.html Calendar property reference
  */
-class Service implements \gClient\ServiceInterface {
+class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countable {
     const CLIENTLOGIN_SERVICE = 'cl';
     const OAUTH_SCOPE         = 'https://www.google.com/calendar/feeds/';
 
@@ -42,23 +42,20 @@ class Service implements \gClient\ServiceInterface {
     protected $_readonly = Array();
 
     /**
-     * @param \gClient\Connection gData connection to make API calls through
-     */
-    /**
-    /**
-    /**
      * Internal pointer for looping through Calendar objects
      * @var int
      */
     protected $pos = 0;
+
     /**
-    /**
-    /**
+     * @param \gClient\Connection gData connection to make API calls through
+     */
     public function __construct(Connection $connection) {
         $this->connection = $connection;
         $only_owner = false;
 
-        $this->pos = $position;
+        $response = $this->prepareCall(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
+        $data = json_decode($response->getContent(), true);
 
         foreach ($data['data']['items'] as $i => $caldata) {
             $this->insertCalendar($caldata);
@@ -168,7 +165,7 @@ class Service implements \gClient\ServiceInterface {
      * 
      */
     protected function insertCalendar(Array $data) {
-        $calendar = new Calendar($data, $this->connection);
+        $calendar = new Calendar($data, $this);
 
         $this->calendars[$calendar->unique_id] = $calendar;
 
@@ -209,6 +206,7 @@ class Service implements \gClient\ServiceInterface {
         if ($pos == $this->pos && $pos > 0) {
             $this->pos--;
         }
+    }
 
     /**
      * @return int
@@ -225,9 +223,7 @@ class Service implements \gClient\ServiceInterface {
             $position = array_search($position, $this->lookup);
         }
 
-        $response = $this->prepareCall(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
-    }
-        $data = json_decode($response->getContent(), true);
+        $this->pos = $position;
 
         if (!$this->valid()) {
             throw new OutOfBoundsException('Invalid index');
@@ -256,6 +252,10 @@ class Service implements \gClient\ServiceInterface {
         $this->pos = 0;
     }
 
+    public function valid() {
+        return isset($this->lookup[$this->pos]);
+    }
+
     /**
      * @return bool
      */
@@ -263,10 +263,6 @@ class Service implements \gClient\ServiceInterface {
         if (isset($this->_readonly['settings'])) {
             return;
         }
-    public function valid() {
-        return isset($this->lookup[$this->pos]);
-    }
-
 
         $this->_readonly['settings'] = new Settings($this);
     }
