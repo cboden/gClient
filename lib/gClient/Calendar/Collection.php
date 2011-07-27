@@ -49,7 +49,9 @@ class Collection implements \SeekableIterator, \Countable {
             $id = $calendar->unique_id;
         }
 
-        $pos = array_search($id, $this->lookup);
+        if (false === ($pos = array_search($id, $this->lookup))) {
+            throw new \OutOfBoundsException("{$calendar} not found in collection");
+        }
 
         unset($this->calendars[$id]);
         array_splice($this->lookup, $pos, 1);
@@ -71,13 +73,17 @@ class Collection implements \SeekableIterator, \Countable {
      */
     public function seek($position) {
         if (!is_integer($position)) {
-            $position = array_search($position, $this->lookup);
+            if (false === ($position = array_search($position, $this->lookup))) {
+                throw new \OutOfBoundsException("Calendar with ID '{$position}' was not found");
+            }
         }
 
-        $this->pos = $position;
+        $current   = $this->pos;
+        $this->pos = (int)$position;
 
         if (!$this->valid()) {
-            throw new OutOfBoundsException('Invalid index');
+            $this->pos = $current;
+            throw new \OutOfBoundsException('Invalid index');
         }
     }
 

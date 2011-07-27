@@ -5,9 +5,7 @@ use gClient\HTTP;
 
 /**
  * This is the main Calendar controlling class
- * It's class name is subject to change before 1.0 - I'm not stuck on it being an Iterator (::getCalendars() instead maybe)
- * 
- * @property Settings $settings A settings object of the Connection users' Google Calendar Settings
+ * @property Settings A settings object of the Connection users' Google Calendar Settings
  * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html Calendar API Protocol documentation
  * @link http://code.google.com/apis/calendar/data/2.0/reference.html Calendar property reference
  */
@@ -25,8 +23,18 @@ class Service implements \gClient\ServiceInterface {
      */
     protected $connection;
 
+    /**
+     * Storage container of each calendar
+     * @internal
+     * @var \gClient\Calendar\Collection
+     */
     protected $_collection;
 
+    /**
+     * Container for various read only properties proxied through __get
+     * @internal
+     * @var Array
+     */
     protected $_readonly = Array();
 
     /**
@@ -38,7 +46,7 @@ class Service implements \gClient\ServiceInterface {
     }
 
     /**
-     * @return Collection
+     * @return \gClient\Calendar\Collection Iterator of Calendars
      */
     public function getCalendars() {
         $this->fetchCalendars();
@@ -197,7 +205,7 @@ class Service implements \gClient\ServiceInterface {
     }
 
     /**
-     * Create an HTTP request class
+     * Create an HTTP request class to manually make a request to Google's API
      * @param string The URL to request
      * @throws \RuntimeException If class $this->client does not implement \gClient\HTTP\ClientInterface
      * @throws \gClient\HTTP\Exception If the server returns a status code of 300 or greater
