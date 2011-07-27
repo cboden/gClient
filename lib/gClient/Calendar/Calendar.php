@@ -73,7 +73,7 @@ class Calendar {
      */
     public function update($property, $value) {
         $own_url = str_replace(Service::ALL_LIST_URL, Service::OWNER_LIST_URL, $this->selfLink);
-        $res = $this->service->prepareCall($own_url)->method('PUT')->setRawData(Array('data' => Array($property => $value)))->request();
+        $res = $this->service->prepareCall($own_url)->setMethod('PUT')->setRawData(Array('data' => Array($property => $value)))->request();
         $this->info[$property] = $value;
     }
 
@@ -88,7 +88,7 @@ class Calendar {
             $query = new EventSelector\AllFuture();
         }
 
-        $res = $this->service->prepareCall($this->eventFeedLink)->method('GET')->setParameters($query->params)->request();
+        $res = $this->service->prepareCall($this->eventFeedLink)->setMethod('GET')->setParameters($query->params)->request();
         $data = json_decode($res->getContent(), true);
 
         if (!isset($data['data']['items'])) {

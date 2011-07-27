@@ -35,7 +35,7 @@ class ClientLogin extends \gClient\Connection {
         extract($this->credentials);
 
         $res = parent::prepareCall(static::URI)
-            ->method('POST')
+            ->setMethod('POST')
             ->setParameters(Array(
                 'Email'       => $username
               , 'accountType' => 'HOSTED_OR_GOOGLE'

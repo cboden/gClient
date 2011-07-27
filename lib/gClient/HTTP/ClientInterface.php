@@ -12,7 +12,7 @@ interface ClientInterface {
      * @param string Method to call
      * @return ClientInterface $this instance to enable a Fluent interface
      */
-    public function method($method);
+    public function setMethod($method);
 
     /**
      * @param array|object|string Data to be set as client body

@@ -80,7 +80,7 @@ class Service implements \gClient\ServiceInterface {
             throw new \UnexpectedValueException("{$content['color']} is not a valid calendar color");
         }
 
-        $res = $this->prepareCall(static::OWNER_LIST_URL)->method('POST')->setRawData(Array('data' => $content))->request();
+        $res = $this->prepareCall(static::OWNER_LIST_URL)->setMethod('POST')->setRawData(Array('data' => $content))->request();
         if (201 != ($http_code = $res->getStatusCode())) {
             throw new HTTP\Exception($res);
         }
@@ -108,7 +108,7 @@ class Service implements \gClient\ServiceInterface {
             $own_url = static::OWNER_LIST_URL . $url;
         }
 
-        $res = $this->prepareCall($own_url)->method('DELETE')->request();
+        $res = $this->prepareCall($own_url)->setMethod('DELETE')->request();
         if ($res->getStatusCode() != 200) {
             throw new HTTP\Exception($res);
         }
@@ -127,7 +127,7 @@ class Service implements \gClient\ServiceInterface {
     public function subscribeToCalendar($id) {
         $this->fetchCalendars();
 
-        $res = $this->prepareCall(static::ALL_LIST_URL)->method('POST')->setRawData(Array('data' => Array('id' => $id)))->request();
+        $res = $this->prepareCall(static::ALL_LIST_URL)->setMethod('POST')->setRawData(Array('data' => Array('id' => $id)))->request();
 
         $data = json_decode($res->getContent(), true);
 // not sure if to return new calendar for $this
@@ -151,7 +151,7 @@ class Service implements \gClient\ServiceInterface {
             $url = static::ALL_LIST_URL . $url;
         }
 
-        $this->prepareCall($url)->method('DELETE')->request();
+        $this->prepareCall($url)->setMethod('DELETE')->request();
 
         $uid = substr($url, strrpos($url, '/') + 1);
         $this->_collection->remove($uid);
@@ -169,7 +169,7 @@ class Service implements \gClient\ServiceInterface {
 
         $only_owner = false;
 
-        $response = $this->prepareCall(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
+        $response = $this->prepareCall(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->setMethod('GET')->request();
         $data = json_decode($response->getContent(), true);
 
         foreach ($data['data']['items'] as $i => $caldata) {

@@ -37,7 +37,7 @@ class Client implements CI {
      * @param string Method to call
      * @return Client $this instance to enable a Fluent interface
      */
-    public function method($method) {
+    public function setMethod($method) {
         $method = strtoupper((string)$method);
         if (!in_array($method, Array('GET', 'POST', 'PUT', 'DELETE'))) {
             throw new Exception("Invalid method {$method}");
