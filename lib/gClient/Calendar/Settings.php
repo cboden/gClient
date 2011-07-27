@@ -19,17 +19,28 @@ namespace gClient\Calendar;
  * @property string $userLocation User entered value used by the $weather setting
  * @property string $weather (C|F) if the user selected a local weather calendar
  * @property int $weekStart (0|1|6) translates to (Sunday|Monday|Saturday)
+ * @todo Implement iterator
  */
-class Settings extends \gClient\PropertyProxy {
-    public function __construct(\gClient\HTTP\ResponseInterface $response) {
-        $data = json_decode($response->getContent(), true);
+class Settings {
+    const URL = '/calendar/feeds/default/settings/';
+
+    protected $_readonly = Array();
+
+    public function __construct(Service $service) {
+        $response = $service->prepareCall(static::URL)->request();
+        $data     = json_decode($response->getContent(), true);
 
         // might need to save the URLs
-        $props = Array();
         foreach ($data['data']['items'] as $i => &$sdata) {
-            $props[$sdata['id']] = $sdata['value'];
+            $this->_readonly[$sdata['id']] = $sdata['value'];
+        }
+    }
+
+    public function __get($name) {
+        if (!isset($this->_readonly[$name])) {
+            return '';
         }
 
-        $this->setData($props);
+        return $this->_readonly[$name];
     }
 }

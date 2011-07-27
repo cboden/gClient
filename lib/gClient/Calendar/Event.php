@@ -25,11 +25,20 @@ namespace gClient\Calendar;
  * @property array $attendees
  * @property array $when
  */
-class Event extends \gClient\PropertyProxy {
-    protected $connection;
+class Event {
+    protected $service;
+    protected $properties;
 
-    public function __construct(Array $data, \gClient\Connection $connection) {
-//        $this->connection = $connection;
-        $this->setData($data);
+    public function __construct(Array $data, Service $service) {
+        $this->service    = $service;
+        $this->properties = $data;
+    }
+
+    public function __get($name) {
+        if (!isset($this->properties[$name])) {
+            return '';
+        }
+
+        return $this->properties[$name];
     }
 }

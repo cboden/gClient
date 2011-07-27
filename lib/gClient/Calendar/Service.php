@@ -11,7 +11,7 @@ use gClient\HTTP;
  * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html Calendar API Protocol documentation
  * @link http://code.google.com/apis/calendar/data/2.0/reference.html Calendar property reference
  */
-class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterface, \SeekableIterator, \Countable {
+class Service implements \gClient\ServiceInterface {
     const CLIENTLOGIN_SERVICE = 'cl';
     const OAUTH_SCOPE         = 'https://www.google.com/calendar/feeds/';
 
@@ -21,13 +21,6 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
 
     const ALL_LIST_URL   = '/calendar/feeds/default/allcalendars/full/';
     const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full/';
-
-    const SETTINGS_URL = '/calendar/feeds/default/settings/';
-
-    const IT_MODE_FIFO = 0;
-    const IT_MODE_FILO = 1;
-    const IT_MODE_OWN  = 2;
-    const IT_MODE_ALL  = 4;
 
     /**
      * Connection to use to make HTTP calls with
@@ -46,34 +39,34 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
      */
     protected $lookup = Array();
 
+    protected $_readonly = Array();
+
+    /**
+     * @param \gClient\Connection gData connection to make API calls through
+     */
+    /**
+    /**
     /**
      * Internal pointer for looping through Calendar objects
      * @var int
      */
     protected $pos = 0;
-
     /**
-     * @param \gClient\Connection gData connection to make API calls through
-     */
+    /**
+    /**
     public function __construct(Connection $connection) {
-        $only_owner = false;
         $this->connection = $connection;
+        $only_owner = false;
 
-        $response = $this->prepareCall(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
-        $data = json_decode($response->getContent(), true);
+        $this->pos = $position;
 
         foreach ($data['data']['items'] as $i => $caldata) {
             $this->insertCalendar($caldata);
         }
     }
 
-    /**
-     * @todo
-     * Boolean operator
-     * Owner calendars - all calendars
-     * Forward/reverse
-     */
-    public function setIteratorMode($mode) {
+    public function __sleep() {
+        return Array('connection');
     }
 
     /**
@@ -152,6 +145,8 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
      * @return Service $this
      */
     public function unsubscribeFromCalendar($calendar) {
+        $this->fetchCalendars();
+
         $url = $calendar;
         if ($calendar instanceof Calendar) {
             $url = static::ALL_LIST_URL . $calendar->unique_id;
@@ -214,7 +209,6 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
         if ($pos == $this->pos && $pos > 0) {
             $this->pos--;
         }
-    }
 
     /**
      * @return int
@@ -231,7 +225,9 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
             $position = array_search($position, $this->lookup);
         }
 
-        $this->pos = $position;
+        $response = $this->prepareCall(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
+    }
+        $data = json_decode($response->getContent(), true);
 
         if (!$this->valid()) {
             throw new OutOfBoundsException('Invalid index');
@@ -263,24 +259,31 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
     /**
      * @return bool
      */
+    protected function fetchSettings() {
+        if (isset($this->_readonly['settings'])) {
+            return;
+        }
     public function valid() {
         return isset($this->lookup[$this->pos]);
     }
 
-    protected function fetchSettings() {
-        if (isset($this->readonly['settings'])) {
-            return;
-        }
 
-        $this->setData(Array('settings' => new Settings($this->prepareCall(static::SETTINGS_URL)->request())));
+        $this->_readonly['settings'] = new Settings($this);
     }
 
+    /**
+     * @internal
+     */
     public function &__get($name) {
         if ($name == 'settings') {
             $this->fetchSettings();
         }
 
-        return parent::__get($name);
+        if (!isset($this->_readonly[$name])) {
+            $this->_readonly[$name] = '';
+        }
+
+        return $this->_readonly[$name];
     }
 
     /**

@@ -27,12 +27,14 @@ use DateTime;
  * @property-write string $timeZone
  * @property int $timesCleaned
  */
-class Calendar extends \gClient\PropertyProxy {
+class Calendar {
     /**
      * Connection to use to make HTTP calls with
      * @var \gClient\Connection
      */
-    protected $connection;
+    protected $service;
+
+    protected $properties = Array();
 
     /**
      * These are the valid colours (I'm Canadian) you can set a calendar to
@@ -52,15 +54,15 @@ class Calendar extends \gClient\PropertyProxy {
      * @param gClient\Auth\Adapter|NULL Authenticated account to use or null for an anonymouse (read-only) connection
      * @todo Change $catalog_data to mixed - URL to fetch, Array if from Catalog
      */
-    public function __construct(Array $properties, Connection $connection) {
+    public function __construct(Array $properties, Service $service) {
         $properties['unique_id'] = substr($properties['id'], strrpos($properties['id'], '/') + 1);
 
-        $this->connection = $connection;
-        $this->setData($properties);
+        $this->service    = $service;
+        $this->properties = $properties;
     }
 
     public function __sleep() {
-        return Array('connection', 'readonly');
+        return Array('service', 'properties');
     }
 
     /**
@@ -71,7 +73,7 @@ class Calendar extends \gClient\PropertyProxy {
      */
     public function update($property, $value) {
         $own_url = str_replace(Service::ALL_LIST_URL, Service::OWNER_LIST_URL, $this->selfLink);
-        $res = $this->prepareCall($own_url)->method('PUT')->setRawData(Array('data' => Array($property => $value)))->request();
+        $res = $this->service->prepareCall($own_url)->method('PUT')->setRawData(Array('data' => Array($property => $value)))->request();
         $this->info[$property] = $value;
     }
 
@@ -86,7 +88,7 @@ class Calendar extends \gClient\PropertyProxy {
             $query = new EventSelector\AllFuture();
         }
 
-        $res = $this->prepareCall($this->eventFeedLink)->method('GET')->setParameters($query->params)->request();
+        $res = $this->service->prepareCall($this->eventFeedLink)->method('GET')->setParameters($query->params)->request();
         $data = json_decode($res->getContent(), true);
 
         if (!isset($data['data']['items'])) {
@@ -95,7 +97,7 @@ class Calendar extends \gClient\PropertyProxy {
 
         $events = new \SplFixedArray(count($data['data']['items']));
         foreach ($data['data']['items'] as $i => $edata) {
-            $events[$i] = new Event($edata, $this->connection);
+            $events[$i] = new Event($edata, $this);
         }
 
         return $events;
@@ -121,15 +123,11 @@ class Calendar extends \gClient\PropertyProxy {
     public function deleteEvent($event) {
     }
 
-    /**
-     * Create an HTTP request class
-     * @param string The URL to request
-     * @throws \RuntimeException If class $this->client does not implement \gClient\HTTP\ClientInterface
-     * @throws \gClient\HTTP\Exception If the server returns a status code of 300 or greater
-     * @throws \UnexpectedValueException If an invalid HTTP Method was set
-     * @return \gClient\HTTP\ResponseInterface Instance of previously set requestor class
-     */
-    public function prepareCall($url) {
-        return $this->connection->prepareCall($url)->addHeader(Service::PROTOCOL_VERSION)->addHeader('Content-Type: ' . Service::CONTENT_TYPE)->setParameter('alt', Service::ALT);
+    public function __get($name) {
+        if (!isset($this->properties[$name])) {
+            return '';
+        }
+
+        return $this->properties[$name];
     }
 }
