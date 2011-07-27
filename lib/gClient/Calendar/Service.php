@@ -11,7 +11,7 @@ use gClient\HTTP;
  * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html Calendar API Protocol documentation
  * @link http://code.google.com/apis/calendar/data/2.0/reference.html Calendar property reference
  */
-class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countable {
+class Service implements \gClient\ServiceInterface {
     const PROTOCOL_VERSION = 'GData-Version: 2';
     const CONTENT_TYPE     = 'application/json';
     const ALT              = 'jsonc';
@@ -25,38 +25,24 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
      */
     protected $connection;
 
-    /**
-     * Array of Calendar objects (cache)
-     * @var Array
-     */
-    protected $calendars = Array();
-
-    /**
-     * @internal
-     */
-    protected $lookup = Array();
+    protected $_collection;
 
     protected $_readonly = Array();
-
-    /**
-     * Internal pointer for looping through Calendar objects
-     * @var int
-     */
-    protected $pos = 0;
 
     /**
      * @param \gClient\Connection gData connection to make API calls through
      */
     public function __construct(Connection $connection) {
-        $this->connection = $connection;
-        $only_owner = false;
+        $this->connection  = $connection;
+        $this->_collection = new Collection();
+    }
 
-        $response = $this->prepareCall(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
-        $data = json_decode($response->getContent(), true);
-
-        foreach ($data['data']['items'] as $i => $caldata) {
-            $this->insertCalendar($caldata);
-        }
+    /**
+     * @return Collection
+     */
+    public function getCalendars() {
+        $this->fetchCalendars();
+        return $this->_collection;
     }
 
     public function __sleep() {
@@ -73,6 +59,8 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
      * @todo Consider setting timeZone from Settings if not set in $attributes
      */
     public function createCalendar($name = null, Array $attributes = Array()) {
+        $this->fetchCalendars();
+
         // I'm still on the fence of which wasy this should be...currently $attributes['title'] wins...
         $content = $attributes + Array('title' => $name);
 
@@ -90,7 +78,7 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
         }
 
         $data = json_decode($res->getContent(), true);
-        return $this->insertCalendar($data['data']);
+        return $this->_collection->insert(new Calendar($data['data'], $this));
     }
 
     /**
@@ -99,6 +87,8 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
      * @throws \gClient\HTTP\Exception
      */
     public function deleteCalendar($calendar) {
+        $this->fetchCalendars();
+
         $url = $calendar;
         if ($calendar instanceof Calendar) {
             $url = $calendar->selfLink;
@@ -116,7 +106,7 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
         }
 
         $uid = substr($own_url, strrpos($own_url, '/') + 1);
-        $this->removeCalendar($uid);
+        $this->_collection->remove($uid);
 
         return $this;
     }
@@ -127,10 +117,13 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
      * @return Calendar
      */
     public function subscribeToCalendar($id) {
+        $this->fetchCalendars();
+
         $res = $this->prepareCall(static::ALL_LIST_URL)->method('POST')->setRawData(Array('data' => Array('id' => $id)))->request();
 
         $data = json_decode($res->getContent(), true);
-        return $this->insertCalendar($data['data']);
+// not sure if to return new calendar for $this
+        return $this->_collection->insert(new Calendar($data['data'], $this));
     }
 
     /**
@@ -153,108 +146,32 @@ class Service implements \gClient\ServiceInterface, \SeekableIterator, \Countabl
         $this->prepareCall($url)->method('DELETE')->request();
 
         $uid = substr($url, strrpos($url, '/') + 1);
-        $this->removeCalendar($uid);
+        $this->_collection->remove($uid);
 
         return $this;
     }
 
     /**
-     * 
+     * @internal
      */
-    protected function insertCalendar(Array $data) {
-        $calendar = new Calendar($data, $this);
-
-        $this->calendars[$calendar->unique_id] = $calendar;
-
-        foreach ($this->lookup as $i => &$id) {
-            if (1 === $this->compare($calendar, $this->calendars[$id])) {
-                array_splice($this->lookup, $i, 0, $calendar->unique_id);
-                return $calendar;
-            }
+    protected function fetchCalendars() {
+        if ($this->_collection->count() > 0) {
+            return;
         }
 
-        array_push($this->lookup, $calendar->unique_id);
-        return $calendar;
-    }
+        $only_owner = false;
 
-    /**
-     * 
-     */
-    public function compare(Calendar $c1, Calendar $c2) {
-        if ($c1->accessLevel != $c2->accessLevel) {
-            if ($c1->accessLevel == 'owner') {
-                return 1;
-            }
+        $response = $this->prepareCall(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
+        $data = json_decode($response->getContent(), true);
 
-            if ($c2->accessLevel == 'owner') {
-                return -1;
-            }
+        foreach ($data['data']['items'] as $i => $caldata) {
+            $this->_collection->insert(new Calendar($caldata, $this));
         }
-
-        return ($c1->title < $c2->title ? 1 : -1);
-    }
-
-    protected function removeCalendar($id) {
-        $pos = array_search($id, $this->lookup);
-
-        unset($this->calendars[$id]);
-        array_splice($this->lookup, $pos, 1);
-
-        if ($pos == $this->pos && $pos > 0) {
-            $this->pos--;
-        }
-    }
-
-    /**
-     * @return int
-     */
-    public function count() {
-        return count($this->calendars);
-    }
-
-    /**
-     * @param int|string The index or unique_id of the calendar to seek to
-     */
-    public function seek($position) {
-        if (!is_integer($position)) {
-            $position = array_search($position, $this->lookup);
-        }
-
-        $this->pos = $position;
-
-        if (!$this->valid()) {
-            throw new OutOfBoundsException('Invalid index');
-        }
-    }
-
-    /**
-     * @return Calendar
-     */
-    public function current() {
-        return $this->calendars[$this->lookup[$this->pos]];
-    }
-
-    /**
-     * @return int
-     */
-    public function key() {
-        return $this->pos;
-    }
-
-    public function next() {
-        $this->pos++;
-    }
-
-    public function rewind() {
-        $this->pos = 0;
-    }
-
-    public function valid() {
-        return isset($this->lookup[$this->pos]);
     }
 
     /**
      * @return bool
+     * @internal
      */
     protected function fetchSettings() {
         if (isset($this->_readonly['settings'])) {
