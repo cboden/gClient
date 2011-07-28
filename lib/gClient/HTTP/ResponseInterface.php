@@ -1,6 +1,9 @@
 <?php
 namespace gClient\HTTP;
 
+/**
+ * An interface for parsing response received from ClientInterface
+ */
 interface ResponseInterface {
     /**
      * @param mixed Response from Requester
@@ -14,7 +17,7 @@ interface ResponseInterface {
 
     /**
      * @param string
-     * @return string|boolean
+     * @return string|bool
      */
     public function getHeaderItem($key);
 

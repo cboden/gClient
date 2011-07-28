@@ -1,10 +1,23 @@
 <?php
 namespace gClient\Calendar;
 
+/**
+ * Container, Iterator of an accounts Calendars, provided from Service
+ */
 class Collection implements \SeekableIterator, \Countable {
+    /**
+     * @internal
+     */
     protected $calendars = Array();
-    protected $lookup    = Array();
 
+    /**
+     * @internal
+     */
+    protected $lookup = Array();
+
+    /**
+     * @internal
+     */
     protected $pos = 0;
 
     /**
@@ -70,6 +83,7 @@ class Collection implements \SeekableIterator, \Countable {
 
     /**
      * @param int|string The index or unique_id of the calendar to seek to
+     * @return void
      */
     public function seek($position) {
         if (!is_integer($position)) {
@@ -101,10 +115,16 @@ class Collection implements \SeekableIterator, \Countable {
         return $this->pos;
     }
 
+    /**
+     * @return void
+     */
     public function next() {
         $this->pos++;
     }
 
+    /**
+     * @return void
+     */
     public function rewind() {
         $this->pos = 0;
     }

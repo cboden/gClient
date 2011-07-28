@@ -3,17 +3,17 @@ namespace gClient\Calendar;
 
 /**
  * Read-only Google Calendar settings
- * @property string $alternateCalendar
+ * @property int $alternateCalendar (0|1|2|3)
  * @property string $country ISO 3166-1-alpha-2 (2 letter country code)
  * @property string $customCalMode 
- * @property string $dateFieldOrder
+ * @property string $dateFieldOrder (DMY|MDY)
  * @property string $defaultCalMode Preferred calendar view (day|week|month|custom|agenda)
- * @property string $displayAllTimezones
+ * @property boolean $displayAllTimezones
  * @property boolean $format24HourTime AM/PM or 24 military hour display
  * @property boolean $hideInvitations
  * @property boolean $hideWeekends
- * @property string $locale 2 letter language code
- * @property boolean $showDeclinedEvents
+ * @property string $locale ISO 639-1 2 letter language code
+ * @property boolean $showDeclinedEvents Whether to display events you have declined to attend in your calendars
  * @property string $timezone Default timezone to create events in
  * @property string $timezoneLabel User defined label for default timezone
  * @property string $userLocation User entered value used by the $weather setting
@@ -26,6 +26,9 @@ class Settings {
 
     protected $_readonly = Array();
 
+    /**
+     * @internal
+     */
     public function __construct(Service $service) {
         $response = $service->prepareCall(static::URL)->request();
         $data     = json_decode($response->getContent(), true);
@@ -36,6 +39,9 @@ class Settings {
         }
     }
 
+    /**
+     * @internal
+     */
     public function __get($name) {
         if (!isset($this->_readonly[$name])) {
             return '';

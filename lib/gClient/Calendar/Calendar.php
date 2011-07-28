@@ -29,11 +29,14 @@ use DateTime;
  */
 class Calendar {
     /**
-     * Connection to use to make HTTP calls with
-     * @var \gClient\Connection
+     * Service to use to make HTTP calls with
+     * @var Service
      */
     protected $service;
 
+    /**
+     * @internal
+     */
     protected $properties = Array();
 
     /**
@@ -50,11 +53,12 @@ class Calendar {
     );
 
     /**
-     * @param string URL of the Google Calendar to work with
-     * @param gClient\Auth\Adapter|NULL Authenticated account to use or null for an anonymouse (read-only) connection
+     * @internal
+     * @param Array Data passed by Service
+     * @param \gClient\ServiceInterface Authenticated account to use or null for an anonymouse (read-only) connection
      * @todo Change $catalog_data to mixed - URL to fetch, Array if from Catalog
      */
-    public function __construct(Array $properties, Service $service) {
+    public function __construct(Array $properties, \gClient\ServiceInterface $service) {
         $properties['unique_id'] = substr($properties['id'], strrpos($properties['id'], '/') + 1);
 
         $this->service    = $service;
@@ -70,6 +74,7 @@ class Calendar {
      * @param string Property name to udpate
      * @param string Value of property to update to
      * @throws \gClient\HTTP\Exception
+     * @return void
      */
     public function update($property, $value) {
         $own_url = str_replace(Service::ALL_LIST_URL, Service::OWNER_LIST_URL, $this->selfLink);
@@ -123,6 +128,9 @@ class Calendar {
     public function deleteEvent($event) {
     }
 
+    /**
+     * @internal
+     */
     public function __get($name) {
         if (!isset($this->properties[$name])) {
             return '';

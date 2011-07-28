@@ -5,7 +5,7 @@ use gClient\HTTP;
 
 /**
  * This is the main Calendar controlling class
- * @property Settings A settings object of the Connection users' Google Calendar Settings
+ * @property Settings $settings A settings object of the Connection users' Google Calendar Settings
  * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html Calendar API Protocol documentation
  * @link http://code.google.com/apis/calendar/data/2.0/reference.html Calendar property reference
  */
@@ -26,7 +26,7 @@ class Service implements \gClient\ServiceInterface {
     /**
      * Storage container of each calendar
      * @internal
-     * @var \gClient\Calendar\Collection
+     * @var Collection
      */
     protected $_collection;
 
@@ -46,7 +46,7 @@ class Service implements \gClient\ServiceInterface {
     }
 
     /**
-     * @return \gClient\Calendar\Collection Iterator of Calendars
+     * @return Collection Iterator of Calendars
      */
     public function getCalendars() {
         $this->fetchCalendars();
@@ -216,10 +216,16 @@ class Service implements \gClient\ServiceInterface {
         return $this->connection->prepareCall($url)->addHeader(static::PROTOCOL_VERSION)->addHeader('Content-Type: ' . static::CONTENT_TYPE)->setParameter('alt', static::ALT);
     }
 
+    /**
+     * @return string
+     */
     public static function getClientLoginService() {
         return 'cl';
     }
 
+    /**
+     * @return string
+     */
     public static function getOAuthScope() {
         return 'https://www.google.com/calendar/feeds/';
     }

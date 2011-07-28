@@ -2,6 +2,7 @@
 namespace gClient\Calendar;
 
 /**
+ * Representation of a single event in Google Calendars
  * @property string $id
  * @property string $title
  * @property string $kind

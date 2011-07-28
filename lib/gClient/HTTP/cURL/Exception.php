@@ -1,4 +1,4 @@
 <?php
 namespace gClient\HTTP\cURL;
 
-class Exception extends \Exception {}
+class Exception extends \gClient\HTTP\Exception {}

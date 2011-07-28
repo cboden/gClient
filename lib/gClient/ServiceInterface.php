@@ -1,9 +1,12 @@
 <?php
 namespace gClient;
 
+/**
+ * Any Service to communicate with a Google App must implement this interface
+ */
 interface ServiceInterface {
     /**
-     * @param \gClient\Connection Active connection to make requests through
+     * @param Connection Active connection to make requests through
      */
     public function __construct(Connection $connection);
 
