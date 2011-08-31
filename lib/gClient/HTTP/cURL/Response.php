@@ -23,6 +23,7 @@ class Response implements RI {
 
     /**
      * @param mixed Response from Requester
+     * @throws \gClient\HTTP\cURL\Exception A response was not received from the server
      */
     public function __construct($req) {
         $i = 0;

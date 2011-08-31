@@ -22,7 +22,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers \gClient\HTTP\cURL\Client::method
+     * @covers \gClient\HTTP\cURL\Client::setMethod
      */
     public function testMethodSuccess() {
         try {

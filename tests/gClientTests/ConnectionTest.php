@@ -36,7 +36,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase {
 */
 
     /**
-     * @covers \gClient\Connection\isAuthenticated
+     * @covers \gClient\Connection::isAuthenticated
      */
     public function testIsConnectedSuccess() {
         $this->assertTrue($this->_conn->isAuthenticated());

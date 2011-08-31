@@ -34,13 +34,14 @@ class Client implements CI {
     }
 
     /**
-     * @param string Method to call
+     * @param string (GET|POST|PUT|DELETE) Method to call
      * @return Client $this instance to enable a Fluent interface
+     * @throws \UnexpectedArgumentException If an invalid method is passed
      */
     public function method($method) {
         $method = strtoupper((string)$method);
         if (!in_array($method, Array('GET', 'POST', 'PUT', 'DELETE'))) {
-            throw new Exception("Invalid method {$method}");
+            throw new \UnexpectedArgumentException("Invalid method {$method}");
         }
         $this->method = $method;
 
