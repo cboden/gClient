@@ -75,7 +75,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
      * @depends testVerifyMethodSet
      */
     public function testInvalidMethod() {
-        $this->setExpectedException('\Exception');
+        $this->setExpectedException('\InvalidArgumentException');
         $this->_client->setMethod('invalid method');
     }
 
