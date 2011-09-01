@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    forceCoversAnnotation="true"
+    mapTestClassNameToCoveredClassName="true"
+    bootstrap="tests/bootstrap.php"
+    colors="true"
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    syntaxCheck="false"
+>
+
+    <testsuites>
+        <testsuite name="gClient Test Suite">
+            <directory>./tests/gClientTests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
