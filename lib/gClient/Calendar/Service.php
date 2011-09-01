@@ -1,11 +1,14 @@
 <?php
 namespace gClient\Calendar;
 use gClient\Connection;
+use gClient\Calendar\Service\Settings;
+use gClient\Calendar\Service\Collection;
 use gClient\HTTP;
 
 /**
  * This is the main Calendar controlling class
- * @property Settings $settings A settings object of the Connection users' Google Calendar Settings
+ * @property \gClient\Calendar\Service\Settings $settings A settings object of the Connection users' Google Calendar Settings
+ * @property \gClient\Calendar\Service\Collection $calendars An iterator of the calendars in this service
  * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html Calendar API Protocol documentation
  * @link http://code.google.com/apis/calendar/data/2.0/reference.html Calendar property reference
  */
@@ -24,33 +27,21 @@ class Service implements \gClient\ServiceInterface {
     protected $connection;
 
     /**
-     * Storage container of each calendar
-     * @internal
-     * @var Collection
-     */
-    protected $_collection;
-
-    /**
      * Container for various read only properties proxied through __get
      * @internal
      * @var Array
      */
-    protected $_readonly = Array();
+    protected $_magic = Array(
+        'calendars' => null
+      , 'settings'  => null
+    );
 
     /**
      * @param \gClient\Connection gData connection to make API calls through
      */
     public function __construct(Connection $connection) {
-        $this->connection  = $connection;
-        $this->_collection = new Collection();
-    }
-
-    /**
-     * @return Collection Iterator of Calendars
-     */
-    public function getCalendars() {
-        $this->fetchCalendars();
-        return $this->_collection;
+        $this->connection          = $connection;
+        $this->_magic['calendars'] = new Collection();
     }
 
     public function __sleep() {
@@ -86,7 +77,7 @@ class Service implements \gClient\ServiceInterface {
         }
 
         $data = json_decode($res->getContent(), true);
-        return $this->_collection->insert(new Calendar($data['data'], $this));
+        return $this->_magic['calendars']->insert(new Calendar($data['data'], $this));
     }
 
     /**
@@ -114,7 +105,7 @@ class Service implements \gClient\ServiceInterface {
         }
 
         $uid = substr($own_url, strrpos($own_url, '/') + 1);
-        $this->_collection->remove($uid);
+        $this->_magic['calendars']->remove($uid);
 
         return $this;
     }
@@ -131,7 +122,7 @@ class Service implements \gClient\ServiceInterface {
 
         $data = json_decode($res->getContent(), true);
 // not sure if to return new calendar for $this
-        return $this->_collection->insert(new Calendar($data['data'], $this));
+        return $this->_magic['calendars']->insert(new Calendar($data['data'], $this));
     }
 
     /**
@@ -154,7 +145,7 @@ class Service implements \gClient\ServiceInterface {
         $this->prepareCall($url)->setMethod('DELETE')->request();
 
         $uid = substr($url, strrpos($url, '/') + 1);
-        $this->_collection->remove($uid);
+        $this->_magic['calendars']->remove($uid);
 
         return $this;
     }
@@ -163,7 +154,7 @@ class Service implements \gClient\ServiceInterface {
      * @internal
      */
     protected function fetchCalendars() {
-        if ($this->_collection->count() > 0) {
+        if ($this->_magic['calendars']->count() > 0) {
             return;
         }
 
@@ -173,7 +164,7 @@ class Service implements \gClient\ServiceInterface {
         $data = json_decode($response->getContent(), true);
 
         foreach ($data['data']['items'] as $i => $caldata) {
-            $this->_collection->insert(new Calendar($caldata, $this));
+            $this->_magic['calendars']->insert(new Calendar($caldata, $this));
         }
     }
 
@@ -182,26 +173,29 @@ class Service implements \gClient\ServiceInterface {
      * @internal
      */
     protected function fetchSettings() {
-        if (isset($this->_readonly['settings'])) {
+        if (null !== $this->_magic['settings']) {
             return;
         }
 
-        $this->_readonly['settings'] = new Settings($this);
+        $this->_magic['settings'] = new Settings($this);
     }
 
     /**
      * @internal
      */
     public function &__get($name) {
+        // need a more elegant way to do this
         if ($name == 'settings') {
             $this->fetchSettings();
+        } elseif ($name == 'calendars') {
+            $this->fetchCalendars();
         }
 
-        if (!isset($this->_readonly[$name])) {
-            $this->_readonly[$name] = '';
+        if (!isset($this->_magic[$name])) {
+            $this->_magic[$name] = '';
         }
 
-        return $this->_readonly[$name];
+        return $this->_magic[$name];
     }
 
     /**

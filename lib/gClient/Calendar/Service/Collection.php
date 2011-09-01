@@ -1,5 +1,6 @@
 <?php
-namespace gClient\Calendar;
+namespace gClient\Calendar\Service;
+use gClient\Calendar\Calendar;
 
 /**
  * Container, Iterator of an accounts Calendars, provided from Service
@@ -40,17 +41,17 @@ class Collection implements \SeekableIterator, \Countable {
      * @internal
      */
     public function compare(Calendar $c1, Calendar $c2) {
-        if ($c1->accessLevel != $c2->accessLevel) {
-            if ($c1->accessLevel == 'owner') {
+        if ($c1->properties->accessLevel != $c2->properties->accessLevel) {
+            if ($c1->properties->accessLevel == 'owner') {
                 return 1;
             }
 
-            if ($c2->accessLevel == 'owner') {
+            if ($c2->properties->accessLevel == 'owner') {
                 return -1;
             }
         }
 
-        return ($c1->title < $c2->title ? 1 : -1);
+        return ($c1->settings->title < $c2->settings->title ? 1 : -1);
     }
 
     /**

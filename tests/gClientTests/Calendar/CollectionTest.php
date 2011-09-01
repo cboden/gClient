@@ -3,11 +3,11 @@ namespace gClientTests\Calendar;
 use gClientTests\Mocks\ServiceMock;
 use gClient\Connection;
 use gClient\Calendar\Service;
-use gClient\Calendar\Collection;
+use gClient\Calendar\Service\Collection;
 use gClient\Calendar\Calendar as Cal;
 
 /**
- * @covers \gClient\Calendar\Collection
+ * @covers \gClient\Calendar\Service\Collection
  * @notes - because I designed to a concrete I can't switch Service with MockService...todo: fix that
  */
 class CollectionTest extends \PHPUnit_Framework_TestCase {
@@ -32,7 +32,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
 
         foreach ($this->_collection as $o => $cal) {
             $ver = $base[$o];
-            $this->assertEquals($cal->id, $ver->id);
+            $this->assertEquals($cal->properties->id, $ver->properties->id);
         }
     }
 
@@ -47,7 +47,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($new_pos, $this->_collection->key());
 
         $cal = $this->_collection->current();
-        $this->assertEquals($cals[$new_pos]->id, $cal->id);
+        $this->assertEquals($cals[$new_pos]->properties->id, $cal->properties->id);
     }
 
     public function testSeekByUniqueId() {
@@ -89,7 +89,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
     /**
      * todo
      *
-    public functino testIterationPointerAfterRemovingItem() {
+    public function testIterationPointerAfterRemovingItem() {
     }
     */
 

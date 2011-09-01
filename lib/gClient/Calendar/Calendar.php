@@ -2,30 +2,16 @@
 namespace gClient\Calendar;
 use gClient\Connection;
 use gClient\Calendar\Service;
+use gClient\Calendar\Meta;
 use DateTime;
 
 /**
  * A Calendar class represents an individual calendar within Google, containing properties and events
  * @property string $unique_id The unique (Google wide) ID of the calendar
- * @property string $id The URL ID of the calendar
- * @property-write string $title Display name of the calendar
- * @property-write string $details
- * @property string $kind
- * @property string $etag
- * @property string $created
- * @property string $updated
- * @property string $eventFeedLink
- * @property string $accessControlListLink
- * @property string $selfLink
- * @property int $canEdit
- * @property Array $author
- * @property string $accessLevel none | read | freebusy | editor | owner | root
- * @property-write string $color
- * @property-write string $hidden
- * @property-write string $location
- * @property-write string $selected
- * @property-write string $timeZone
- * @property int $timesCleaned
+ * @property Meta\Settings $settings Changeable options pertaining to the calendar
+ * @property Meta\Properties $properties Read-only attributes associated with the calendar
+ * @property Meta\Sharing $sharing Manage who has what access to the calendar
+ * @property Meta\Extensions $extensions User defined properties
  */
 class Calendar {
     /**
@@ -34,22 +20,13 @@ class Calendar {
      */
     protected $service;
 
-    /**
-     * @internal
-     */
-    protected $properties = Array();
+    protected $_magic = Array(
+        'settings'   => null
+      , 'properties' => null
+      , 'sharing'    => null
+      , 'extensions' => null
 
-    /**
-     * These are the valid colours (I'm Canadian) you can set a calendar to
-     * @link http://code.google.com/apis/calendar/data/2.0/reference.html#gcal_reference
-     */
-    public static $valid_colors = Array(
-          '#A32929', '#B1365F', '#7A367A', '#5229A3', '#29527A', '#2952A3', '#1B887A'
-        , '#28754E', '#0D7813', '#528800', '#88880E', '#AB8B00', '#BE6D00', '#B1440E'
-        , '#865A5A', '#705770', '#4E5D6C', '#5A6986', '#4A716C', '#6E6E41', '#8D6F47'
-        , '#853104', '#691426', '#5C1158', '#23164E', '#182C57', '#060D5E', '#125A12'
-        , '#2F6213', '#2F6309', '#5F6B02', '#8C500B', '#8C500B', '#754916', '#6B3304'
-        , '#5B123B', '#42104A', '#113F47', '#333333', '#0F4B38', '#856508', '#711616'
+      , 'unique_id'  => null
     );
 
     /**
@@ -59,14 +36,28 @@ class Calendar {
      * @todo Change $catalog_data to mixed - URL to fetch, Array if from Catalog
      */
     public function __construct(Array $properties, \gClient\ServiceInterface $service) {
-        $properties['unique_id'] = substr($properties['id'], strrpos($properties['id'], '/') + 1);
+        $this->_magic['unique_id'] = substr($properties['id'], strrpos($properties['id'], '/') + 1);
 
-        $this->service    = $service;
-        $this->properties = $properties;
+        foreach (Array('settings', 'properties') as $attribute) {
+            $ns = __NAMESPACE__ . '\\Meta\\' . $attribute;
+            $this->_magic[$attribute] = new $ns($this);
+
+            $values   = Array();
+            $required = $this->_magic[$attribute]->getNames();
+            foreach ($required as $key) {
+                if (isset($properties[$key])) {
+                    $values[$key] = $properties[$key];
+                }
+            }
+
+            $this->_magic[$attribute]->softSetValues($values);
+        }
+
+        $this->service = $service;
     }
 
     public function __sleep() {
-        return Array('service', 'properties');
+        return Array('service', '_magic');
     }
 
     /**
@@ -79,7 +70,8 @@ class Calendar {
     public function update($property, $value) {
         $own_url = str_replace(Service::ALL_LIST_URL, Service::OWNER_LIST_URL, $this->selfLink);
         $res = $this->service->prepareCall($own_url)->setMethod('PUT')->setRawData(Array('data' => Array($property => $value)))->request();
-        $this->info[$property] = $value;
+// need to udpate settings/property
+//        $this->info[$property] = $value;
     }
 
     /**
@@ -131,11 +123,11 @@ class Calendar {
     /**
      * @internal
      */
-    public function __get($name) {
-        if (!isset($this->properties[$name])) {
-            return '';
+    public function &__get($name) {
+        if (!isset($this->_magic[$name])) {
+            $this->_magic[$name] = '';
         }
 
-        return $this->properties[$name];
+        return $this->_magic[$name];
     }
 }

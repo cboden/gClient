@@ -1,5 +1,6 @@
 <?php
-namespace gClient\Calendar;
+namespace gClient\Calendar\Service;
+use gClient\Calendar\Service;
 
 /**
  * Read-only Google Calendar settings
