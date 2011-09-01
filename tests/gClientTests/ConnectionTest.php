@@ -3,7 +3,7 @@ namespace gClientTests;
 use gClient\Connection;
 
 /**
- * @covers \gClient\Connection
+ * @covers gClient\Connection
  */
 class ConnectionTest extends \PHPUnit_Framework_TestCase {
     protected $_conn;
@@ -12,9 +12,6 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase {
         $this->_conn = new Connection();
     }
 
-    /**
-     * @covers \gClient\Connection::addService
-     */
     public function testAddServiceCalendar() {
         $this->_conn->addService('Calendar');
         $this->assertAttributeEquals(Array('Calendar' => 'gClient\Calendar\Service'), 'services', $this->_conn);
@@ -26,7 +23,6 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @ covers \gClient\Connection::getService
      * @ depends testAddServiceCalendar
      * @todo HttpMocks need to be done with fake data before this can be done
      * /
@@ -35,9 +31,6 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase {
     }
 */
 
-    /**
-     * @covers \gClient\Connection::isAuthenticated
-     */
     public function testIsConnectedSuccess() {
         $this->assertTrue($this->_conn->isAuthenticated());
     }

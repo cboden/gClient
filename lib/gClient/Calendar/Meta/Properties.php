@@ -36,9 +36,12 @@ class Properties {
         $this->_calendar = $calendar;
     }
 
-    public function &__get($name) {
+    /**
+     * @internal
+     */
+    public function __get($name) {
         if (!isset($this->_magic[$name])) {
-            $this->_magic[$name] = '';
+            return '';
         }
 
         return $this->_magic[$name];

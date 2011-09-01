@@ -7,7 +7,7 @@ use gClient\Calendar\Service\Collection;
 use gClient\Calendar\Calendar as Cal;
 
 /**
- * @covers \gClient\Calendar\Service\Collection
+ * @covers gClient\Calendar\Service\Collection
  * @notes - because I designed to a concrete I can't switch Service with MockService...todo: fix that
  */
 class CollectionTest extends \PHPUnit_Framework_TestCase {
@@ -86,12 +86,17 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
         $this->_collection->remove($this->_collection->count() + 5);
     }
 
-    /**
-     * todo
-     *
     public function testIterationPointerAfterRemovingItem() {
+        $cals = $this->fillProvider();
+        $base = $this->calendarProvider();
+        $pos  = 2;
+
+        $this->_collection->seek($pos);
+        $this->_collection->remove($base[$pos]->unique_id);
+
+        $current = $this->_collection->current();
+        $this->assertEquals($current->unique_id, $base[$pos - 1]->unique_id);
     }
-    */
 
     public function fillProvider() {
         $cals = $this->calendarProvider();
