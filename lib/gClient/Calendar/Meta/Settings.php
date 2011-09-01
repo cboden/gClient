@@ -1,6 +1,7 @@
 <?php
 namespace gClient\Calendar\Meta;
 use gClient\Calendar;
+use gClient\Calendar\Service;
 use gClient\Calendar\Calendar as Cal;
 
 /**
@@ -55,7 +56,17 @@ class Settings {
         return $this->_magic[$name];
     }
 
-    public function set($key, $val) {
+    /**
+     * Update one of the properties of this class
+     * @param string Property name to udpate
+     * @param string Value of property to update to
+     * @throws \gClient\HTTP\Exception
+     * @return void
+     */
+    public function update($setting, $value) {
+        $own_url = str_replace(Service::ALL_LIST_URL, Service::OWNER_LIST_URL, $this->_calendar->properties->selfLink);
+        $res = $this->_calendar->prepareCall($own_url)->setMethod('PUT')->setRawData(Array('data' => Array($setting => $value)))->request();
+        $this->_magic[$setting] = $value;
     }
 
     public function getNames() {

@@ -61,20 +61,6 @@ class Calendar {
     }
 
     /**
-     * Update one of the properties of this class
-     * @param string Property name to udpate
-     * @param string Value of property to update to
-     * @throws \gClient\HTTP\Exception
-     * @return void
-     */
-    public function update($property, $value) {
-        $own_url = str_replace(Service::ALL_LIST_URL, Service::OWNER_LIST_URL, $this->selfLink);
-        $res = $this->service->prepareCall($own_url)->setMethod('PUT')->setRawData(Array('data' => Array($property => $value)))->request();
-// need to udpate settings/property
-//        $this->info[$property] = $value;
-    }
-
-    /**
      * Fetch the scheduled events from this calendar between a specified dates
      * @param EventSelector|NULL Set the parameters of which events to fetch
      * @throws /gClient\HTTP\Exception
@@ -118,6 +104,10 @@ class Calendar {
      * @throws \gClient\HTTP\Exception
      */
     public function deleteEvent($event) {
+    }
+
+    public function prepareCall($url) {
+        return $this->service->prepareCall($url);
     }
 
     /**
