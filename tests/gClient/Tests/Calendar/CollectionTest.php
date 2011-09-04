@@ -1,6 +1,6 @@
 <?php
-namespace gClientTests\Calendar;
-use gClientTests\Mocks\ServiceMock;
+namespace gClient\Tests\Calendar;
+//use gClient\Tests\Mocks\ServiceMock;
 use gClient\Connection;
 use gClient\Calendar\Service;
 use gClient\Calendar\Service\Collection;

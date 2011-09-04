@@ -1,5 +1,5 @@
 <?php
-namespace gClientTests\HTTP\cURL;
+namespace gClient\Tests\HTTP\cURL;
 use gClient\HTTP\cURL;
 
 /**

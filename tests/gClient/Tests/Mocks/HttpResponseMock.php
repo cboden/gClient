@@ -1,5 +1,5 @@
 <?php
-namespace gClientTests\Mocks;
+namespace gClient\Tests\Mocks;
 use gClient\HTTP\ClientResponse;
 
 class HttpResponseMock implements ClientResponse {

@@ -1,5 +1,5 @@
 <?php
-namespace gClientTests\Auth;
+namespace gClient\Tests\Auth;
 use gClient\Auth\OAuth;
 
 /**

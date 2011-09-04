@@ -1,5 +1,5 @@
 <?php
-namespace gClientTests;
+namespace gClient\Tests;
 use gClient\Connection;
 
 /**
@@ -18,8 +18,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testAddServiceMock() {
-        $this->_conn->addService('\gClientTests\Mocks\ServiceMock');
-        $this->assertAttributeEquals(Array('\gClientTests\Mocks\ServiceMock' => '\gClientTests\Mocks\ServiceMock'), 'services', $this->_conn);
+        $this->_conn->addService('\gClient\Tests\Mocks\ServiceMock');
+        $this->assertAttributeEquals(Array('\gClient\Tests\Mocks\ServiceMock' => '\gClient\Tests\Mocks\ServiceMock'), 'services', $this->_conn);
     }
 
     /**
