@@ -1,15 +1,24 @@
 <?php
 namespace gClient\Tests;
-use gClient\Connection;
 
 /**
  * @covers gClient\Connection
  */
 class ConnectionTest extends \PHPUnit_Framework_TestCase {
+    protected static $_class = '\\gClient\\Connection';
     protected $_conn;
 
     public function setUp() {
-        $this->_conn = new Connection();
+        $class       = static::$_class;
+        $this->_conn = new $class();
+    }
+
+    protected static function getMethod($name) {
+        $class = new \ReflectionClass(static::$_class);
+        $method = $class->getMethod($name);
+        $method->setAccessible(true);
+
+        return $method;
     }
 
     public function testAddServiceCalendar() {
@@ -33,6 +42,35 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase {
 
     public function testIsConnectedSuccess() {
         $this->assertTrue($this->_conn->isAuthenticated());
+    }
+
+    public function testCanSerializeConnection() {
+        $serialized  = serialize($this->_conn);
+        $objectified = unserialize($serialized);
+
+        $constraint = $this->isInstanceOf('\\gClient\\Connection');
+        $this->assertThat($objectified, $constraint);
+    }
+
+    public function testGetAnInvalidServiceClassException() {
+        $this->setExpectedException('\\RuntimeException');
+
+        $method = $this->getMethod('getServiceClass');
+        $method->invokeArgs($this->_conn, Array('HerpDerpFudgeBananas'));
+    }
+
+    public function testVerifyServiceClassIsImplementsService() {
+        $this->setExpectedException('\\UnexpectedValueException');
+
+        $method = $this->getMethod('getServiceClass');
+        $method->invokeArgs($this->_conn, Array(new \DateTime('now'), true));
+    }
+
+    public function testVerifyPublicClientClassEnforced() {
+        $this->setExpectedException('\\RuntimeException');
+
+        $this->_conn->req_class = '\\StdClass';
+        $this->_conn->prepareCall('http://localhost');
     }
 
 /* trying to test isAuthenticated without __construct() - still learning Mock, not there yet

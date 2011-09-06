@@ -21,9 +21,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         new cURL\Client('invalid url');
     }
 
-    /**
-     * @covers \gClient\HTTP\cURL\Client::setMethod
-     */
     public function testMethodSuccess() {
         try {
             $this->_client->setMethod('GET');
@@ -43,9 +40,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         $this->assertAttributeEquals('POST', 'method', $this->_client);
     }
 
-    /**
-     * @covers \gClient\HTTP\cURL\Client::setRawData
-     */
     public function testSetRawData() {
         $string = 'Hello World!';
 
@@ -61,9 +55,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         $this->assertAttributeEquals($string, 'params', $this->_client);
     }
 
-    /**
-     * @covers \gClient\HTTP\cURL\Client::setParameter
-     */
     public function testSetParameter() {
         list($key, $val) = Array('Hello', 'World');
 

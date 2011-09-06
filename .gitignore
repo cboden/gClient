@@ -1,0 +1,4 @@
+phpunit.xml
+docs
+coverage
+sandbox
