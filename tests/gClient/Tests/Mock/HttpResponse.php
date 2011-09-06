@@ -1,8 +1,12 @@
 <?php
-namespace gClient\Tests\Mocks;
+namespace gClient\Tests\Mock;
 use gClient\HTTP\ClientResponse;
 
-class HttpResponseMock implements ClientResponse {
+class HttpResponse implements ClientResponse {
+    public $_status_code;
+    public $_header;
+    public $_content;
+
     public function __construct($response) {
     }
 

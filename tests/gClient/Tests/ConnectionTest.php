@@ -27,8 +27,8 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testAddServiceMock() {
-        $this->_conn->addService('\gClient\Tests\Mocks\ServiceMock');
-        $this->assertAttributeEquals(Array('\gClient\Tests\Mocks\ServiceMock' => '\gClient\Tests\Mocks\ServiceMock'), 'services', $this->_conn);
+        $this->_conn->addService('\gClient\Tests\Mock\Service');
+        $this->assertAttributeEquals(Array('\gClient\Tests\Mock\Service' => '\gClient\Tests\Mock\Service'), 'services', $this->_conn);
     }
 
     /**

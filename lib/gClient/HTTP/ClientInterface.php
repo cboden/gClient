@@ -7,6 +7,7 @@ namespace gClient\HTTP;
 interface ClientInterface {
     /**
      * @param string Valid URL to call
+     * @throws \InvalidArgumentException If an invalid URL is passed
      */
     public function __construct($url);
 
