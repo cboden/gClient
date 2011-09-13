@@ -13,6 +13,7 @@ use gClient\Calendar\Calendar as Cal;
  * @property-write string $location
  * @property-write string $selected
  * @property-write string $timeZone
+ * @todo consider creating __set() aliasing update() 
  */
 class Settings {
     /**

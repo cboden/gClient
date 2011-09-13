@@ -73,6 +73,10 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase {
         $this->_conn->prepareCall('http://localhost');
     }
 
+    public function testAuthenticateReturnsSelf() {
+        $this->assertSame($this->_conn, $this->_conn->authenticate());
+    }
+
 /* trying to test isAuthenticated without __construct() - still learning Mock, not there yet
     public function testIsConnectedFalse() {
         $mock_conn = $this->getMock(

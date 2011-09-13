@@ -39,6 +39,7 @@ class Collection implements \SeekableIterator, \Countable {
 
     /**
      * @internal
+     * @todo Compare owner info, if email is present it gets in first
      */
     public function compare(Calendar $c1, Calendar $c2) {
         if ($c1->properties->accessLevel != $c2->properties->accessLevel) {

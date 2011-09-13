@@ -3,6 +3,8 @@ namespace gClient\Calendar;
 use gClient\Connection;
 use gClient\Calendar\Service;
 use gClient\Calendar\Meta;
+use gClient\Calendar\Builder\SelectEvents;
+use gClient\Calendar\Builder\SelectEvents as SelectEventsDefault;
 use DateTime;
 
 /**
@@ -62,13 +64,13 @@ class Calendar {
 
     /**
      * Fetch the scheduled events from this calendar between a specified dates
-     * @param EventSelector|NULL Set the parameters of which events to fetch
+     * @param Builder\SelectEvents|NULL Set the parameters of which events to fetch
      * @throws /gClient\HTTP\Exception
      * @return \SplFixedArray of Event
      */
-    public function getEvents(EventSelector $query = null) {
+    public function getEvents(SelectEvents $query = null) {
         if ($query === null) {
-            $query = new EventSelector\AllFuture();
+            $query = new SelectEventsDefault();
         }
 
         $res = $this->service->prepareCall($this->eventFeedLink)->setMethod('GET')->setParameters($query->params)->request();
@@ -87,10 +89,17 @@ class Calendar {
     }
 
     /**
-     * @param Event|string Either a Event with all the set parameters or a string to parse as an event ex. "Squash with Chris tomorrow at noon"
+     * @param Builder\NewEvent|Event|string A NewEvent Builder to create a new event,
+     * an existing Event to duplicate or a string to parse as an event ex. "Squash with Chris tomorrow at noon"
      * @return Event
      */
     public function createEvent($event) {
+    }
+
+    function quickCreateEvent($string) {
+    }
+
+    function insertEvent(EventBuilder $event) {
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
-namespace gClient\Calendar\EventSelector;
-use gClient\Calendar\EventSelector as myParent;
+namespace gClient\Calendar\Builder\SelectEvents;
+use gClient\Calendar\Builder\SelectEvents as myParent;
 
 class Updates extends myParent {
     public function __construct(\DateTime $since) {

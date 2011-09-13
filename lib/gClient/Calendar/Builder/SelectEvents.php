@@ -1,13 +1,13 @@
 <?php
-namespace gClient\Calendar;
+namespace gClient\Calendar\Builder;
 
-abstract class EventSelector {
+abstract class SelectEvents {
     public $params = Array(
         'orderby' => 'starttime'
     );
 
     public function setTimeZone(\DateTimeZone $ctz) {
-        $this->params['ctz'] = '';
+        $this->params['ctz'] = ''; //todo?
         return $this;
     }
 

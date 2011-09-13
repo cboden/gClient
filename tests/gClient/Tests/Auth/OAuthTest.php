@@ -31,4 +31,11 @@ class OAuthTest extends \PHPUnit_Framework_TestCase {
         $this->_oauth->setRefreshToken($token);
         $this->assertAttributeEquals($token, 'ref_token', $this->_oauth);
     }
+
+    public function testCanSerializeConnection() {
+        $serialized  = serialize($this->_oauth);
+        $objectified = unserialize($serialized);
+
+        $this->assertInstanceOf('\\gClient\\Auth\\OAuth', $objectified);
+    }
 }

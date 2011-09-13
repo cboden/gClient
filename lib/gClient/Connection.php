@@ -62,8 +62,6 @@ class Connection {
     }
 
     public function __wakeup() {
-        echo "Saved: {$this->auth_token}\n";
-
         if ($this->verify_token_on_restoration) {
             // todo
         }

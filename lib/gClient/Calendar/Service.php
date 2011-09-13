@@ -3,6 +3,7 @@ namespace gClient\Calendar;
 use gClient\Connection;
 use gClient\Calendar\Service\Settings;
 use gClient\Calendar\Service\Collection;
+use gClient\Calendar\Builder\NewCalendar;
 use gClient\HTTP;
 
 /**
@@ -49,19 +50,17 @@ class Service implements \gClient\ServiceInterface {
     }
 
     /**
-     * @param string $name Name of calendar to create
-     * @param Array Additional creational params - associative keys: (details, timeZone, hidden, color, location)
+     * @param string Builder\NewCalendar A builder object containing the parameters for creating a new calendar
      * @return Calendar
      * @throws \UnexpectedValueException On an empty name/title or invalid color
      * @throws \gClient\HTTP\Exception On a bad return from Google
      * @todo This appends to end of all calendars - should append to end of owner calendars - including alphabetical order
      * @todo Consider setting timeZone from Settings if not set in $attributes
      */
-    public function createCalendar($name = null, Array $attributes = Array()) {
+    public function createCalendar(NewCalendar $new) {
         $this->fetchCalendars();
 
-        // I'm still on the fence of which wasy this should be...currently $attributes['title'] wins...
-        $content = $attributes + Array('title' => $name);
+        $content = $new->params;
 
         if (is_null($content['title']) || empty($content['title'])) {
             throw new \UnexpectedValueException('Calendar name/title should be set');
@@ -77,7 +76,10 @@ class Service implements \gClient\ServiceInterface {
         }
 
         $data = json_decode($res->getContent(), true);
-        return $this->_magic['calendars']->insert(new Calendar($data['data'], $this));
+        $cal  = new Calendar($data['data'], $this);
+        $this->_magic['calendars']->insert($cal);
+
+        return $cal;
     }
 
     /**
