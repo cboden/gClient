@@ -22,10 +22,17 @@ use gClient\Calendar\Service;
  * @property int $weekStart (0|1|6) translates to (Sunday|Monday|Saturday)
  * @todo Implement iterator
  */
-class Settings {
+class Settings implements \IteratorAggregate {
     const URL = '/calendar/feeds/default/settings/';
 
     protected $_readonly = Array();
+
+    /**
+     * @return \ArrayIterator
+     */
+    public function getIterator() {
+        return new \ArrayIterator($this->_readonly);
+    }
 
     /**
      * @internal
