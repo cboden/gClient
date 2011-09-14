@@ -51,7 +51,7 @@ class Service implements \gClient\ServiceInterface, \IteratorAggregate {
     }
 
     /**
-     * @return Iterator
+     * @return Service\Collection
      */
     public function getIterator() {
         return $this->calendars;
