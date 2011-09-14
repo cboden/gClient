@@ -2,6 +2,7 @@
 namespace gClient\HTTP;
 
 /**
+ * An exception created when a Client request receives an HTTP error code
  * @property ResponseInterface $response HTTP Response object - useful for fetching headers
  */
 class Exception extends \Exception {
@@ -21,6 +22,9 @@ class Exception extends \Exception {
         $this->readonly['response'] = $response;
     }
 
+    /**
+     * @internal
+     */
     public function &__get($name) {
         if (!isset($this->readonly[$name])) {
             $this->readonly[$name] = '';

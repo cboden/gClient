@@ -1,5 +1,5 @@
 <?php
-namespace gClientTests\HTTP\cURL;
+namespace gClient\Tests\HTTP\cURL;
 use gClient\HTTP\cURL;
 
 /**
@@ -21,15 +21,12 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         new cURL\Client('invalid url');
     }
 
-    /**
-     * @covers \gClient\HTTP\cURL\Client::setMethod
-     */
     public function testMethodSuccess() {
         try {
-            $this->_client->method('GET');
-            $this->_client->method('POST');
-            $this->_client->method('PUT');
-            $this->_client->method('DELETE');
+            $this->_client->setMethod('GET');
+            $this->_client->setMethod('POST');
+            $this->_client->setMethod('PUT');
+            $this->_client->setMethod('DELETE');
         } catch (\Exception $e) {
             $this->fail("Client::method threw an exception on GET|POST|PUT|DELETE ({$e->getMessage()})");
         }
@@ -39,13 +36,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
      * @depends testMethodSuccess
      */
     public function testVerifyMethodSet() {
-        $this->_client->method('POST');
+        $this->_client->setMethod('POST');
         $this->assertAttributeEquals('POST', 'method', $this->_client);
     }
 
-    /**
-     * @covers \gClient\HTTP\cURL\Client::setRawData
-     */
     public function testSetRawData() {
         $string = 'Hello World!';
 
@@ -61,9 +55,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
         $this->assertAttributeEquals($string, 'params', $this->_client);
     }
 
-    /**
-     * @covers \gClient\HTTP\cURL\Client::setParameter
-     */
     public function testSetParameter() {
         list($key, $val) = Array('Hello', 'World');
 
@@ -75,12 +66,12 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
      * @depends testVerifyMethodSet
      */
     public function testInvalidMethod() {
-        $this->setExpectedException('\Exception');
-        $this->_client->method('invalid method');
+        $this->setExpectedException('\InvalidArgumentException');
+        $this->_client->setMethod('invalid method');
     }
 
     public function testFluentInterface() {
-        $this->assertSame($this->_client, $this->_client->method('GET'));
+        $this->assertSame($this->_client, $this->_client->setMethod('GET'));
         $this->assertSame($this->_client, $this->_client->setRawData('a'));
         $this->assertSame($this->_client, $this->_client->setParameter('a', 'b'));
         $this->assertSame($this->_client, $this->_client->addHeader('a'));

@@ -1,8 +1,8 @@
 <?php
-namespace gClientTests\Mocks;
+namespace gClient\Tests\Mock;
 use gClient\Connection;
 
-class ServiceMock implements \gClient\ServiceInterface {
+class Service implements \gClient\ServiceInterface {
     public function __construct(Connection $connection) {
     }
 

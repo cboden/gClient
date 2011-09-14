@@ -4,6 +4,7 @@ use gClient\HTTP\ClientInterface as CI;
 use gClient\HTTP;
 
 /**
+ * A \gClient\HTTP\ClientInterface implementation using the cURL library
  * @link http://code.google.com/apis/gdata/articles/using_cURL.html
  */
 class Client implements CI {
@@ -13,16 +14,27 @@ class Client implements CI {
       , CURLOPT_FOLLOWLOCATION => false
       , CURLOPT_USERAGENT      => 'Mozilla/5.0'
     );
+
+    /**
+     * @internal
+     */
     protected $opts = Array();
 
+    /**
+     * @internal
+     */
     protected $headers = Array();
+
+    /**
+     * @internal
+     */
     protected $params  = Array();
 
     protected $method  =  'GET';
 
     /**
      * @param string Valid URL to call
-     * @return Client $this instance to enable a Fluent interface
+     * @throws \InvalidArgumentException If an invalid URL is passed
      */
     public function __construct($url) {
         if (!(boolean)filter_var($url, FILTER_VALIDATE_URL)) {
@@ -38,7 +50,7 @@ class Client implements CI {
      * @return Client $this instance to enable a Fluent interface
      * @throws \InvalidArgumentException If an invalid method is passed
      */
-    public function method($method) {
+    public function setMethod($method) {
         $method = strtoupper((string)$method);
         if (!in_array($method, Array('GET', 'POST', 'PUT', 'DELETE'))) {
             throw new \InvalidArgumentException("Invalid method {$method}");

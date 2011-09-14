@@ -1,5 +1,5 @@
 <?php
-namespace gClientTests\Calendar\TestAssets;
+namespace gClient\Tests\Calendar\TestAssets;
 use gClient\Calendar;
 
 class GoogleServer {

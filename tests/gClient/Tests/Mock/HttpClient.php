@@ -1,18 +1,18 @@
 <?php
-namespace gClientTests\Mocks;
+namespace gClient\Tests\Mock;
 use gClient\HTTP\ClientInterface;
 
-class HttpClientMock implements ClientInterface {
-    protected $_url;
-    protected $_method;
-    protected $_params  = Array();
-    protected $_headers = Array();
+class HttpClient implements ClientInterface {
+    public $_url;
+    public $_method;
+    public $_params  = Array();
+    public $_headers = Array();
 
     public function __construct($url) {
         $this->_url = $url;
     }
 
-    public function method($method) {
+    public function setMethod($method) {
         $this->_method = $method;
     }
 

@@ -62,8 +62,6 @@ class Connection {
     }
 
     public function __wakeup() {
-        echo "Saved: {$this->auth_token}\n";
-
         if ($this->verify_token_on_restoration) {
             // todo
         }
@@ -109,11 +107,12 @@ class Connection {
      * @throws \RuntimeException If passing the name of the service as a string but does not exist in the library
      * @throws \UnexpectedValueException If a valid class is passed but does not implement \gClient\ServiceInterface
      * @return string Class implementing \gClient\ServiceInterface
+     * @todo Refactor the logic of this...it's a little dicey as I found out in unit testing
      */
     protected function getServiceClass($name) {
         $class = $name;
 
-        if (!class_exists($class)) {
+        if (!is_object($class) && !class_exists($class)) {
             $class = __NAMESPACE__ . '\\' . $name . '\\Service';
             if (!class_exists($class)) {
                 throw new \RuntimeException("{$name} is not a valid service");
@@ -121,7 +120,7 @@ class Connection {
         } else {
             if (class_exists('\ReflectionClass', false)) {
                 $reflection = new \ReflectionClass($class);
-                if (!$reflection->implementsInterface('\gClient\ServiceInterface')) {
+                if (!$reflection->implementsInterface('\\gClient\\ServiceInterface')) {
                     throw new \UnexpectedValueException('Service must be an implementation of \\gClient\\ServiceInterface');
                 }
             }

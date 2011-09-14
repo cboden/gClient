@@ -1,10 +1,13 @@
 <?php
 namespace gClient\HTTP;
 
+/**
+ * An interface to make RESTful calls to a remote API
+ */
 interface ClientInterface {
     /**
      * @param string Valid URL to call
-     * @return ClientInterface $this instance to enable a Fluent interface
+     * @throws \InvalidArgumentException If an invalid URL is passed
      */
     public function __construct($url);
 
@@ -12,7 +15,7 @@ interface ClientInterface {
      * @param string Method to call
      * @return ClientInterface $this instance to enable a Fluent interface
      */
-    public function method($method);
+    public function setMethod($method);
 
     /**
      * @param array|object|string Data to be set as client body

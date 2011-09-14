@@ -74,7 +74,7 @@ class OAuth extends \gClient\Connection {
      */
     public function requestAuthToken($user_code) {
         $res = parent::prepareCall(static::TOKEN_AUTH_URL)
-            ->method('POST')
+            ->setMethod('POST')
             ->setParameters(Array(
                 'code'          => $user_code
               , 'client_id'     => $this->client_id
@@ -99,7 +99,7 @@ class OAuth extends \gClient\Connection {
      */
     protected function refreshToken() {
         $res = parent::prepareCall(static::TOKEN_AUTH_URL)
-            ->method('POST')
+            ->setMethod('POST')
             ->setParameters(Array(
                 'client_id'     => $this->client_id
               , 'client_secret' => $this->client_secret

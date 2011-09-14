@@ -1,35 +1,26 @@
 <?php
 namespace gClient\Calendar;
 use gClient\Connection;
+use gClient\Calendar\Service\Settings;
+use gClient\Calendar\Service\Collection;
+use gClient\Calendar\Builder\NewCalendar;
+use gClient\Calendar\Meta\Settings as CalSettings;
 use gClient\HTTP;
-use SplDoublyLinkedList, Closure;
-
-// maybe to list generation on construct
-// Catalog, Listing, Library, Directory
-// Manager, Cabnet, Composite, ???
-
-// new SplPriorityQueue
 
 /**
  * This is the main Calendar controlling class
- * It's class name is subject to change before 1.0 - I'm not stuck on it being an Iterator (::getCalendars() instead maybe)
- * 
- * @property Settings $settings A settings object of the Connection users' Google Calendar Settings
+ * @property \gClient\Calendar\Service\Settings $settings A settings object of the Connection users' Google Calendar Settings
+ * @property \gClient\Calendar\Service\Collection $calendars An iterator of the calendars in this service
  * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html Calendar API Protocol documentation
  * @link http://code.google.com/apis/calendar/data/2.0/reference.html Calendar property reference
  */
-class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterface, \SeekableIterator, \Countable {
-    const CLIENTLOGIN_SERVICE = 'cl';
-    const OAUTH_SCOPE         = 'https://www.google.com/calendar/feeds/';
-
+class Service implements \gClient\ServiceInterface, \IteratorAggregate {
     const PROTOCOL_VERSION = 'GData-Version: 2';
     const CONTENT_TYPE     = 'application/json';
     const ALT              = 'jsonc';
 
     const ALL_LIST_URL   = '/calendar/feeds/default/allcalendars/full/';
     const OWNER_LIST_URL = '/calendar/feeds/default/owncalendars/full/';
-
-    const SETTINGS_URL = '/calendar/feeds/default/settings/';
 
     /**
      * Connection to use to make HTTP calls with
@@ -38,77 +29,62 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
     protected $connection;
 
     /**
-     * Calendar data list returned from Google
-     * @var Array
-     */
-    protected $data = Array();
-
-    /**
-     * Array of Calendar objects (cache)
-     * @var Array
-     */
-    protected $calendars = Array();
-
-    /**
+     * Container for various read only properties proxied through __get
      * @internal
+     * @var Array
      */
-    protected $lookup = Array();
-
-    /**
-     * Internal pointer for looping through Calendar objects
-     * @var int
-     */
-    protected $pos = 0;
+    protected $_magic = Array(
+        'calendars' => null
+      , 'settings'  => null
+    );
 
     /**
      * @param \gClient\Connection gData connection to make API calls through
      */
     public function __construct(Connection $connection) {
-        $only_owner = false;
-        $this->connection = $connection;
+        $this->connection          = $connection;
+        $this->_magic['calendars'] = new Collection();
+    }
 
-        $response = $this->prepareCall(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->method('GET')->request();
-        $data = json_decode($response->getContent(), true);
-
-        foreach ($data['data']['items'] as $i => $caldata) {
-            $calendar = new Calendar($caldata, $connection);
-
-            $this->calendars[$calendar->unique_id] = $calendar;
-            $this->lookup[] = $calendar->unique_id;
-        }
-
-        unset($data['data']['items']);
-        $this->data = $data['data'];
+    public function __sleep() {
+        return Array('connection');
     }
 
     /**
-     * @param string $name Name of calendar to create
-     * @param Array Additional creational params - associative keys: (details, timeZone, hidden, color, location)
+     * @return Service\Collection
+     */
+    public function getIterator() {
+        return $this->calendars;
+    }
+
+    /**
+     * @param string Builder\NewCalendar A builder object containing the parameters for creating a new calendar
      * @return Calendar
      * @throws \UnexpectedValueException On an empty name/title or invalid color
      * @throws \gClient\HTTP\Exception On a bad return from Google
      * @todo This appends to end of all calendars - should append to end of owner calendars - including alphabetical order
      * @todo Consider setting timeZone from Settings if not set in $attributes
      */
-    public function createCalendar($name = null, Array $attributes = Array()) {
-        // I'm still on the fence of which wasy this should be...currently $attributes['title'] wins...
-        $content = $attributes + Array('title' => $name);
+    public function createCalendar(NewCalendar $new) {
+        $this->fetchCalendars();
+
+        $content = $new->params;
 
         if (is_null($content['title']) || empty($content['title'])) {
             throw new \UnexpectedValueException('Calendar name/title should be set');
         }
 
-        if (isset($content['color']) && !in_array($content['color'], Calendar::$valid_colors)) {
+        if (isset($content['color']) && !in_array($content['color'], CalSettings::$valid_colors)) {
             throw new \UnexpectedValueException("{$content['color']} is not a valid calendar color");
         }
 
-        $res = $this->prepareCall(static::OWNER_LIST_URL)->method('POST')->setRawData(Array('data' => $content))->request();
+        $res = $this->prepareCall(static::OWNER_LIST_URL)->setMethod('POST')->setRawData(Array('data' => $content))->request();
         if (201 != ($http_code = $res->getStatusCode())) {
             throw new HTTP\Exception($res);
         }
 
         $data = json_decode($res->getContent(), true);
-        return $this->appendCalendar($data['data']);
+        return $this->_magic['calendars']->insert(new Calendar($data['data'], $this));
     }
 
     /**
@@ -117,9 +93,11 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
      * @throws \gClient\HTTP\Exception
      */
     public function deleteCalendar($calendar) {
+        $this->fetchCalendars();
+
         $url = $calendar;
         if ($calendar instanceof Calendar) {
-            $url = $calendar->selfLink;
+            $url = $calendar->properties->selfLink;
         }
 
         $own_url = str_replace(static::ALL_LIST_URL, static::OWNER_LIST_URL, $url);
@@ -128,13 +106,13 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
             $own_url = static::OWNER_LIST_URL . $url;
         }
 
-        $res = $this->prepareCall($own_url)->method('DELETE')->request();
+        $res = $this->prepareCall($own_url)->setMethod('DELETE')->request();
         if ($res->getStatusCode() != 200) {
             throw new HTTP\Exception($res);
         }
 
         $uid = substr($own_url, strrpos($own_url, '/') + 1);
-        $this->removeCalendar($uid);
+        $this->_magic['calendars']->remove($uid);
 
         return $this;
     }
@@ -145,10 +123,13 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
      * @return Calendar
      */
     public function subscribeToCalendar($id) {
-        $res = $this->prepareCall(static::ALL_LIST_URL)->method('POST')->setRawData(Array('data' => Array('id' => $id)))->request();
+        $this->fetchCalendars();
+
+        $res = $this->prepareCall(static::ALL_LIST_URL)->setMethod('POST')->setRawData(Array('data' => Array('id' => $id)))->request();
 
         $data = json_decode($res->getContent(), true);
-        return $this->appendCalendar($data['data']);
+// not sure if to return new calendar for $this
+        return $this->_magic['calendars']->insert(new Calendar($data['data'], $this));
     }
 
     /**
@@ -157,6 +138,8 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
      * @return Service $this
      */
     public function unsubscribeFromCalendar($calendar) {
+        $this->fetchCalendars();
+
         $url = $calendar;
         if ($calendar instanceof Calendar) {
             $url = static::ALL_LIST_URL . $calendar->unique_id;
@@ -166,110 +149,75 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
             $url = static::ALL_LIST_URL . $url;
         }
 
-        $this->prepareCall($url)->method('DELETE')->request();
+        $this->prepareCall($url)->setMethod('DELETE')->request();
 
         $uid = substr($url, strrpos($url, '/') + 1);
-        $this->removeCalendar($uid);
+        $this->_magic['calendars']->remove($uid);
 
         return $this;
     }
 
     /**
-     * @param Array
-     * @return Calendar
+     * @param string Title of the new Calendar
+     * @return Builder\NewCalendar
      */
-    protected function appendCalendar($data) {
-        $calendar = new Calendar($data, $this->connection);
+    public function buildCalendar($title) {
+        $class   = __NAMESPACE__ . '\\Builder\\NewCalendar';
+        $builder = new $class($title, $this);
 
-        $this->calendars[$calendar->unique_id] = $calendar;
-        $this->lookup[] = $calendar->unique_id;
-
-        return $calendar;
-    }
-
-    protected function removeCalendar($id) {
-        $pos = array_search($id, $this->lookup);
-
-        unset($this->calendars[$id]);
-        array_splice($this->lookup, $pos, 1);
-
-        if ($pos == $this->pos && $pos > 0) {
-            $this->pos--;
-        }
+        return $builder;
     }
 
     /**
-     * @return int
+     * @internal
      */
-    public function count() {
-        return count($this->calendars);
-    }
-
-    /**
-     * @param int|string
-     * @todo allow $position to be unique_id
-     */
-    public function seek($position) {
-        if (!is_integer($position)) {
-            $position = array_search($position, $this->lookup);
+    protected function fetchCalendars() {
+        if ($this->_magic['calendars']->count() > 0) {
+            return;
         }
 
-        $this->pos = $position;
+        $only_owner = false;
 
-        if (!$this->valid()) {
-            throw new OutOfBoundsException('Invalid index');
+        $response = $this->prepareCall(((boolean)$only_owner ? static::OWNER_LIST_URL : static::ALL_LIST_URL))->setMethod('GET')->request();
+        $data = json_decode($response->getContent(), true);
+
+        foreach ($data['data']['items'] as $i => $caldata) {
+            $this->_magic['calendars']->insert(new Calendar($caldata, $this));
         }
-
-        return $this->current();
-    }
-
-    /**
-     * @return Calendar
-     */
-    public function current() {
-        return $this->calendars[$this->lookup[$this->pos]];
-    }
-
-    /**
-     * @return int
-     */
-    public function key() {
-        return $this->pos;
-    }
-
-    public function next() {
-        $this->pos++;
-    }
-
-    public function rewind() {
-        $this->pos = 0;
     }
 
     /**
      * @return bool
+     * @internal
      */
-    public function valid() {
-        return isset($this->lookup[$this->pos]);
-    }
-
     protected function fetchSettings() {
-        if (isset($this->readonly['settings'])) {
+        if (null !== $this->_magic['settings']) {
             return;
         }
 
-        $this->setData(Array('settings' => new Settings($this->prepareCall(static::SETTINGS_URL)->request())));
-    }
-
-    public function &__get($name) {
-        if ($name == 'settings') {
-            $this->fetchSettings();
-        }
-
-        return parent::__get($name);
+        $this->_magic['settings'] = new Settings($this);
     }
 
     /**
-     * Create an HTTP request class
+     * @internal
+     */
+    public function &__get($name) {
+        // need a more elegant way to do this
+        if ($name == 'settings') {
+            $this->fetchSettings();
+        } elseif ($name == 'calendars') {
+            $this->fetchCalendars();
+        }
+
+        if (!isset($this->_magic[$name])) {
+            $this->_magic[$name] = '';
+        }
+
+        return $this->_magic[$name];
+    }
+
+    /**
+     * Create an HTTP request class to manually make a request to Google's API
      * @param string The URL to request
      * @throws \RuntimeException If class $this->client does not implement \gClient\HTTP\ClientInterface
      * @throws \gClient\HTTP\Exception If the server returns a status code of 300 or greater
@@ -280,11 +228,17 @@ class Service extends \gClient\PropertyProxy implements \gClient\ServiceInterfac
         return $this->connection->prepareCall($url)->addHeader(static::PROTOCOL_VERSION)->addHeader('Content-Type: ' . static::CONTENT_TYPE)->setParameter('alt', static::ALT);
     }
 
+    /**
+     * @return string
+     */
     public static function getClientLoginService() {
-        return static::CLIENTLOGIN_SERVICE;
+        return 'cl';
     }
 
+    /**
+     * @return string
+     */
     public static function getOAuthScope() {
-        return static::OAUTH_SCOPE;
+        return 'https://www.google.com/calendar/feeds/';
     }
 }

@@ -2,6 +2,9 @@
 namespace gClient\HTTP\cURL;
 use gClient\HTTP\ResponseInterface as RI;
 
+/**
+ * A \gClient\HTTP\ResponseInterface implementation using the cURL library
+ */
 class Response implements RI {
     /**
      * @uses curl_getinfo
@@ -76,7 +79,7 @@ class Response implements RI {
 
     /**
      * @param string
-     * @return string|boolean
+     * @return string|bool
      */
     public function getHeaderItem($key) {
         $needle = "\n{$key}: ";
