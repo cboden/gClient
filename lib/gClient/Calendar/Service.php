@@ -14,7 +14,7 @@ use gClient\HTTP;
  * @link http://code.google.com/apis/calendar/data/2.0/developers_guide_protocol.html Calendar API Protocol documentation
  * @link http://code.google.com/apis/calendar/data/2.0/reference.html Calendar property reference
  */
-class Service implements \gClient\ServiceInterface {
+class Service implements \gClient\ServiceInterface, \IteratorAggregate {
     const PROTOCOL_VERSION = 'GData-Version: 2';
     const CONTENT_TYPE     = 'application/json';
     const ALT              = 'jsonc';
@@ -48,6 +48,13 @@ class Service implements \gClient\ServiceInterface {
 
     public function __sleep() {
         return Array('connection');
+    }
+
+    /**
+     * @return Iterator
+     */
+    public function getIterator() {
+        return $this->calendars;
     }
 
     /**
