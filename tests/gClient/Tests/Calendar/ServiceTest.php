@@ -32,4 +32,17 @@ class ServiceTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertInstanceOf('\\gClient\\Calendar\\Service', $objectified);
     }
+
+    public function testNewCalendarBuilderFactoryReturnType() {
+        $builder = $this->_service->buildCalendar('Hello World!');
+
+        $this->assertInstanceOf('\\gClient\\Calendar\\Builder\\NewCalendar', $builder);
+    }
+
+    public function testNewCalendarBuilderFactoryValue() {
+        $title   = 'This is the title';
+        $builder = $this->_service->buildCalendar($title);
+
+        $this->assertEquals($title, $builder->params['title']);
+    }
 }

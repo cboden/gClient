@@ -4,6 +4,7 @@ use gClient\Connection;
 use gClient\Calendar\Service\Settings;
 use gClient\Calendar\Service\Collection;
 use gClient\Calendar\Builder\NewCalendar;
+use gClient\Calendar\Meta\Settings as CalSettings;
 use gClient\HTTP;
 
 /**
@@ -66,7 +67,7 @@ class Service implements \gClient\ServiceInterface {
             throw new \UnexpectedValueException('Calendar name/title should be set');
         }
 
-        if (isset($content['color']) && !in_array($content['color'], Calendar::$valid_colors)) {
+        if (isset($content['color']) && !in_array($content['color'], CalSettings::$valid_colors)) {
             throw new \UnexpectedValueException("{$content['color']} is not a valid calendar color");
         }
 
@@ -76,10 +77,7 @@ class Service implements \gClient\ServiceInterface {
         }
 
         $data = json_decode($res->getContent(), true);
-        $cal  = new Calendar($data['data'], $this);
-        $this->_magic['calendars']->insert($cal);
-
-        return $cal;
+        return $this->_magic['calendars']->insert(new Calendar($data['data'], $this));
     }
 
     /**
@@ -150,6 +148,13 @@ class Service implements \gClient\ServiceInterface {
         $this->_magic['calendars']->remove($uid);
 
         return $this;
+    }
+
+    public function buildCalendar($title) {
+        $class   = __NAMESPACE__ . '\\Builder\\NewCalendar';
+        $builder = new $class($title, $this);
+
+        return $builder;
     }
 
     /**

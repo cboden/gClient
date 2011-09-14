@@ -78,4 +78,13 @@ class NewCalendarTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($this->_nc, $this->_nc->setColour('#705770'));
         $this->assertSame($this->_nc, $this->_nc->setLocation('London'));
     }
+
+    public function testCanNotFlushWithoutServiceProvider() {
+        $this->setExpectedException('RuntimeException');
+        $this->_nc->flush();
+    }
+
+    public function testFlushCreatesCalendarFromService() {
+        $this->markTestIncomplete('todo');
+    }
 }

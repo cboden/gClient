@@ -1,14 +1,21 @@
 <?php
 namespace gClient\Calendar\Builder;
+use gClient\Calendar\Service;
 
 class NewCalendar {
     public $params = Array();
 
     /**
+     * @type gClient\Calendar\Service
+     */
+    protected $_service;
+
+    /**
      * @param string
      */
-    public function __construct($name) {
+    public function __construct($name, Service $service = null) {
         $this->params['title'] = (string)$name;
+        $this->_service = $service;
     }
 
     /**
@@ -95,5 +102,16 @@ class NewCalendar {
         $this->params['location'] = (string)$location;
 
         return $this;
+    }
+
+    /**
+     * @return gClient\Calendar\Calendar
+     */
+    public function flush() {
+        if (!($this->_service instanceof Service)) {
+            throw new \RuntimeException('There is no account attached to this builder');
+        }
+
+        return $this->_service->createCalendar($this);
     }
 }

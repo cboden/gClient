@@ -23,6 +23,7 @@ class Collection implements \SeekableIterator, \Countable {
 
     /**
      * @internal
+     * @return \gClient\Calendar\Calendar
      */
     public function insert(Calendar $calendar) {
         $this->calendars[$calendar->unique_id] = $calendar;
@@ -30,11 +31,12 @@ class Collection implements \SeekableIterator, \Countable {
         foreach ($this->lookup as $i => &$id) {
             if (1 === $this->compare($calendar, $this->calendars[$id])) {
                 array_splice($this->lookup, $i, 0, $calendar->unique_id);
-                return;
+                return $calendar;
             }
         }
 
         array_push($this->lookup, $calendar->unique_id);
+        return $calendar;
     }
 
     /**
@@ -104,7 +106,7 @@ class Collection implements \SeekableIterator, \Countable {
     }
 
     /**
-     * @return Calendar
+     * @return gClient\Calendar\Calendar
      */
     public function current() {
         return $this->calendars[$this->lookup[$this->pos]];
