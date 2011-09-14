@@ -18,7 +18,7 @@ use gClient\Calendar\Calendar as Cal;
  * @property string $accessLevel none | read | freebusy | editor | owner | root
  * @property int $timesCleaned
  */
-class Properties {
+class Properties implements \IteratorAggregate {
     /**
      * @internal
      */
@@ -45,6 +45,13 @@ class Properties {
         }
 
         return $this->_magic[$name];
+    }
+
+    /**
+     * @return \ArrayIterator
+     */
+    public function getIterator() {
+        return new \ArrayIterator($this->_magic);
     }
 
     public function getNames() {

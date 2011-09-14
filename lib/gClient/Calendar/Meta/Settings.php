@@ -15,7 +15,7 @@ use gClient\Calendar\Calendar as Cal;
  * @property-write string $timeZone
  * @todo consider creating __set() aliasing update() 
  */
-class Settings {
+class Settings implements \IteratorAggregate {
     /**
      * @internal
      */
@@ -56,6 +56,13 @@ class Settings {
         }
 
         return $this->_magic[$name];
+    }
+
+    /**
+     * @return \ArrayIterator
+     */
+    public function getIterator() {
+        return new \ArrayIterator($this->_magic);
     }
 
     /**
