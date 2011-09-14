@@ -3,7 +3,10 @@
 A fully PSR-0 compliant, RESTful PHP client for Google Calendar API 2.0.  
 The goal is to make this API intuitive without requiring knowledge of the gData API.  
 
-If Calendar works out more Apps API clients can be created (Contacts, URL Shortener, etc.)
+Note: It is strongly recommended using OAuth2 for authentication.  
+If you choose to use the ClientLogin instead, please be aware that often when using the ClientLogin for the first time Google will issue a CAPTCHA challenge.  
+If a CAPTCHA challenge is issued gClient throws an Exception.  Currently you must go to your browser, login as that account, accepting the CAPTCHA.  
+Once you have passed the CAPTCHA (externally) your application will connect.
 
 ---
 
@@ -26,21 +29,21 @@ If Calendar works out more Apps API clients can be created (Contacts, URL Shorte
 * Consider simplifying Service interactions (refactor create/subscribe, delete/unsubscribe)
 * Sort Service calendars to match server (owned, subscriptions, alphabetical)
 * Better exceptions
+* Sharing
 
 ---
 
 ##Quick ClientLogin test
 
-(a better test coming soon, Calendar\Service is about to get overhauled)
-
     <?php
         // Assuming gClient is in autoload path
         try {
             $conn = new gClient\Auth\ClientLogin('myaccount@gmail.com', 'my password here', 'testing-name-1a');
-            $calendar = $conn->addService('Calendar')->authenticate()->getService('Calendar');
+            $calendars = $conn->addService('Calendar')->authenticate()->getService('Calendar');
 
-            // Get the Country code setting from your Calendar
-            echo $calendar->settings->country;
+            foreach ($calendars as $calendar) {
+                echo "{$calendar->settings->title}\n";
+            }
         } catch (Exception $e) {
             echo $e->getMessage();
         }

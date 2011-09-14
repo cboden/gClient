@@ -28,6 +28,7 @@ class Settings {
 
     /**
      * These are the valid colours (I'm Canadian) you can set a calendar to
+     * In the event Google allows more colours without this being updated, it's a public property, able to be updated
      * @link http://code.google.com/apis/calendar/data/2.0/reference.html#gcal_reference
      */
     public static $valid_colors = Array(
@@ -62,7 +63,7 @@ class Settings {
      * @param string Property name to udpate
      * @param string Value of property to update to
      * @throws \gClient\HTTP\Exception
-     * @return void
+     * @return null
      */
     public function update($setting, $value) {
         $own_url = str_replace(Service::ALL_LIST_URL, Service::OWNER_LIST_URL, $this->_calendar->properties->selfLink);

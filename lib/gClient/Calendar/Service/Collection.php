@@ -87,7 +87,7 @@ class Collection implements \SeekableIterator, \Countable {
 
     /**
      * @param int|string The index or unique_id of the calendar to seek to
-     * @return void
+     * @return null
      */
     public function seek($position) {
         if (!is_integer($position)) {
@@ -120,14 +120,14 @@ class Collection implements \SeekableIterator, \Countable {
     }
 
     /**
-     * @return void
+     * @return null
      */
     public function next() {
         $this->pos++;
     }
 
     /**
-     * @return void
+     * @return null
      */
     public function rewind() {
         $this->pos = 0;

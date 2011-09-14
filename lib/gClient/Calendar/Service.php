@@ -97,7 +97,7 @@ class Service implements \gClient\ServiceInterface, \IteratorAggregate {
 
         $url = $calendar;
         if ($calendar instanceof Calendar) {
-            $url = $calendar->selfLink;
+            $url = $calendar->properties->selfLink;
         }
 
         $own_url = str_replace(static::ALL_LIST_URL, static::OWNER_LIST_URL, $url);
@@ -157,6 +157,10 @@ class Service implements \gClient\ServiceInterface, \IteratorAggregate {
         return $this;
     }
 
+    /**
+     * @param string Title of the new Calendar
+     * @return Builder\NewCalendar
+     */
     public function buildCalendar($title) {
         $class   = __NAMESPACE__ . '\\Builder\\NewCalendar';
         $builder = new $class($title, $this);

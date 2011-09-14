@@ -45,4 +45,15 @@ class ServiceTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals($title, $builder->params['title']);
     }
+
+    public function testIteratorInterface() {
+        $this->assertInstanceOf('\\IteratorAggregate', $this->_service);
+    }
+
+    public function testIteratorInterfaceReturnsIterator() {
+        $this->markTestIncomplete('getIterator is trying to connect to Google...need to intercept it to complete test');
+        return;
+
+        $this->assertInstanceOf('\\Iterator', $this->_service->getIterator());
+    }
 }

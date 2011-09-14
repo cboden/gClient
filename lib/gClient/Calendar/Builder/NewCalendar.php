@@ -13,8 +13,8 @@ class NewCalendar {
     /**
      * @param string
      */
-    public function __construct($name, Service $service = null) {
-        $this->params['title'] = (string)$name;
+    public function __construct($title, Service $service = null) {
+        $this->params['title'] = (string)$title;
         $this->_service = $service;
     }
 
