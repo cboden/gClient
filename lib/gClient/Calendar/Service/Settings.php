@@ -23,6 +23,9 @@ use gClient\Calendar\Service;
  * @todo Implement iterator
  */
 class Settings implements \IteratorAggregate {
+    /**
+     * @todo Google hasn't made this URL discoverable yet, hard-coded for now
+     */
     const URL = '/calendar/feeds/default/settings/';
 
     protected $_readonly = Array();

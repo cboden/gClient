@@ -162,8 +162,7 @@ class Service implements \gClient\ServiceInterface, \IteratorAggregate {
      * @return Builder\NewCalendar
      */
     public function buildCalendar($title) {
-        $class   = __NAMESPACE__ . '\\Builder\\NewCalendar';
-        $builder = new $class($title, $this);
+        $builder = new NewCalendar($title, $this);
 
         return $builder;
     }

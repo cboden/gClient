@@ -30,7 +30,6 @@ Once you have passed the CAPTCHA (externally) your application will connect.
 * Sort Service calendars to match server (owned, subscriptions, alphabetical)
 * Better exceptions
 * Sharing
-* Implement Iterator Interface on meta/settings classes
 
 ---
 

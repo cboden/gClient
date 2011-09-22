@@ -27,12 +27,12 @@ namespace gClient\Calendar;
  * @property array $when
  */
 class Event {
-    protected $service;
-    protected $properties;
+    protected $_calendar;
+    protected $_properties;
 
-    public function __construct(Array $data, Service $service) {
-        $this->service    = $service;
-        $this->properties = $data;
+    public function __construct(Array $data, Calendar $calendar) {
+        $this->_calendar   = $calendar;
+        $this->_properties = $data;
     }
 
     public function __get($name) {

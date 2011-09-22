@@ -5,6 +5,8 @@ use gClient\Calendar\Service;
 use gClient\Calendar\Meta;
 use gClient\Calendar\Builder\SelectEvents;
 use gClient\Calendar\Builder\SelectEvents as SelectEventsDefault;
+use gClient\Calendar\Builder\NewEvent;
+use gClient\Calendar\Builder\NewRecurringEvent;
 use DateTime;
 
 /**
@@ -89,14 +91,42 @@ class Calendar {
     }
 
     /**
+     * @return Builder\NewEvent
+     */
+    public function buildEvent($title, \DateTime $start, \DateTime $end) {
+        $builder = new NewEvent($title, $start, $end, $this);
+        return $builder;
+    }
+
+    /**
+     * @return Builder\NewRecurringEvent
+     */
+    public function buildRecurringEvent($title, \DatePeriod $period) {
+        $builder = new NewRecurringEvent($title, $period);
+        return $builder;
+    }
+
+    /**
      * @param Builder\NewEvent|Event|string A NewEvent Builder to create a new event,
      * an existing Event to duplicate or a string to parse as an event ex. "Squash with Chris tomorrow at noon"
      * @return Event
      */
     public function createEvent($event) {
+        $result = $this->prepareCall($this->properties->eventFeedLink)->setMethod('POST')->setRawData(Array('data' => $event->params))->request();
+        $data   = json_decode($result->getContent(), true);
+
+        return new Event($data['data'], $this);
     }
 
+    /**
+     * @param string
+     * @return Event
+     */
     function quickCreateEvent($string) {
+        $result = $this->prepareCall($this->properties->eventFeedLink)->setMethod('POST')->setRawData(Array('data' => Array('details' => (string)$string, 'quickAdd' => true)))->request();
+        $data   = json_decode($result->getContent(), true);
+
+        return new Event($data['data'], $this);
     }
 
     function insertEvent(EventBuilder $event) {
