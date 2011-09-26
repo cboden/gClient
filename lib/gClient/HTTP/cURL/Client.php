@@ -2,12 +2,15 @@
 namespace gClient\HTTP\cURL;
 use gClient\HTTP\ClientInterface as CI;
 use gClient\HTTP;
+use gClient\HTTP\FactoryInterface;
 
 /**
  * A \gClient\HTTP\ClientInterface implementation using the cURL library
  * @link http://code.google.com/apis/gdata/articles/using_cURL.html
  */
 class Client implements CI {
+    protected $factory;
+
     protected static $default_opts = Array(
         CURLOPT_HEADER         => true
       , CURLOPT_RETURNTRANSFER => true
@@ -34,15 +37,18 @@ class Client implements CI {
 
     /**
      * @param string Valid URL to call
+     * @param Factory Factory class to find response from
      * @throws \InvalidArgumentException If an invalid URL is passed
      */
-    public function __construct($url) {
+    public function __construct($url, FactoryInterface $factory) {
         if (!(boolean)filter_var($url, FILTER_VALIDATE_URL)) {
             throw new \InvalidArgumentException("{$url} is not a valid URL");
         }
 
         $this->opts = self::$default_opts;
         $this->opts[CURLOPT_URL] = $url;
+
+        $this->factory = $factory;
     }
 
     /**
@@ -149,7 +155,7 @@ class Client implements CI {
         $req = curl_init();
         curl_setopt_array($req, $this->opts);
 
-        $response = new Response($req);
+        $response = $this->factory->makeResponse($req);
 
         if ($response->getStatusCode() >= 300) {
             throw new HTTP\Exception($response);

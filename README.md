@@ -30,6 +30,7 @@ Once you have passed the CAPTCHA (externally) your application will connect.
 * Sort Service calendars to match server (owned, subscriptions, alphabetical)
 * Better exceptions
 * Sharing
+* Client up cURL Client/Response - kind of hard coded at the moment
 
 ---
 

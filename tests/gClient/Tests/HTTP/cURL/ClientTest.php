@@ -6,10 +6,12 @@ use gClient\HTTP\cURL;
  * @covers \gClient\HTTP\cURL\Client
  */
 class ClientTest extends \PHPUnit_Framework_TestCase {
+    protected $_factory;
     protected $_client;
 
     public function setUp() {
-        $this->_client = new cURL\Client('http://localhost');
+        $this->_factory = new cURL\Factory();
+        $this->_client  = $this->_factory->makeClient('http://localhost');
     }
 
     public function testClientInterface() {
@@ -18,7 +20,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase {
 
     public function testInvalidUrlException() {
         $this->setExpectedException('\InvalidArgumentException');
-        new cURL\Client('invalid url');
+        $this->_factory->makeClient('invalid url');
     }
 
     public function testMethodSuccess() {

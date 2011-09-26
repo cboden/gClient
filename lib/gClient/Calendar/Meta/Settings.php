@@ -26,6 +26,8 @@ class Settings implements \IteratorAggregate {
      */
     protected $_magic = Array();
 
+    protected $_buffer = Array();
+
     /**
      * These are the valid colours (I'm Canadian) you can set a calendar to
      * In the event Google allows more colours without this being updated, it's a public property, able to be updated
@@ -56,6 +58,27 @@ class Settings implements \IteratorAggregate {
         }
 
         return $this->_magic[$name];
+    }
+
+    public function __set($name, $value) {
+        // Throwing exception now, but could use extended properties here...
+        if (!isset($this->_magic[$name])) {
+            throw new \UnexpectedValueException("{$name} is not a valid setting");
+        }
+
+        $this->_magic[$name]  = $value;
+        $this->_buffer[$name] = $value;
+    }
+
+    public function flush() {
+        if (0 === count($this->_buffer)) {
+            return false;
+        }
+
+        $own_url = str_replace(Service::ALL_LIST_URL, Service::OWNER_LIST_URL, $this->_calendar->properties->selfLink);
+        $res = $this->_calendar->prepareCall($own_url)->setMethod('PUT')->setRawData(Array('data' => $this->_buffer))->request();
+
+        $this->_buffer = Array();
     }
 
     /**

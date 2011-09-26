@@ -11,7 +11,7 @@ class OAuth extends \gClient\Connection {
     const TOKEN_REQ_URL  = 'https://accounts.google.com/o/oauth2/auth';
     const TOKEN_AUTH_URL = 'https://accounts.google.com/o/oauth2/token';
 
-    const TYPE  = 'code';
+    const TYPE = 'code';
 
     const GRANT_AUTH = 'authorization_code';
     const GRANT_REF  = 'refresh_token';
@@ -48,7 +48,7 @@ class OAuth extends \gClient\Connection {
     }
 
     public function __sleep() {
-        return Array('auth_token', 'ref_token', 'expires', 'client_id', 'client_secret', 'services', 'req_class', 'verify_token_on_restoration');
+        return Array('auth_token', 'ref_token', 'expires', 'client_id', 'client_secret', 'services', 'factory', 'verify_token_on_restoration');
     }
 
     /**

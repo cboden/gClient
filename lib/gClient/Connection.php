@@ -1,5 +1,6 @@
 <?php
 namespace gClient;
+use gClient\HTTP\FactoryInterface;
 
 /**
  * Base Google Connection class.  All services require an instance of this class
@@ -37,11 +38,9 @@ class Connection {
     protected $instances = Array();
 
     /**
-     * Classname of the requestor class to use when making REST calls
-     * Must implment \gClient\HTTP\ClientInterface
-     * @var string
+     * @var gClient\HTTP\FactoryInterface
      */
-    public $req_class = '\gClient\HTTP\cURL\Client';
+    protected $factory;
 
     /**
      * Not extening this call creates an Anonymous connection
@@ -58,13 +57,17 @@ class Connection {
      * </code>
      */
     public function __sleep() {
-        return Array('auth_token', 'services', 'req_class', 'verify_token_on_restoration');
+        return Array('auth_token', 'services', 'factory', 'verify_token_on_restoration');
     }
 
     public function __wakeup() {
         if ($this->verify_token_on_restoration) {
             // todo
         }
+    }
+
+    public function setHTTPFactory(FactoryInterface $factory) {
+        $this->factory = $factory;
     }
 
     /**
@@ -146,12 +149,15 @@ class Connection {
      * @return \gClient\HTTP\ResponseInterface Instance of previously set requestor class
      */
     public function prepareCall($url) {
+        if (null === $this->factory) {
+            $this->setHTTPFactory(new \gClient\HTTP\cURL\Factory);
+        }
+
         if (!(boolean)filter_var($url, FILTER_VALIDATE_URL)) {
             $url = static::BASE_URL . $url;
         }
 
-        $class  = $this->req_class;
-        $client = new $class($url);
+        $client = $this->factory->makeClient($url);
 
         if (!($client instanceof \gClient\HTTP\ClientInterface)) {
             throw new \RuntimeException('Requester class must be instance of HTTP\ClientInterface');

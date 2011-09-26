@@ -7,9 +7,10 @@ namespace gClient\HTTP;
 interface ClientInterface {
     /**
      * @param string Valid URL to call
+     * @param FactoryInterface The factory used to create this class
      * @throws \InvalidArgumentException If an invalid URL is passed
      */
-    public function __construct($url);
+    public function __construct($url, FactoryInterface $factory);
 
     /**
      * @param string Method to call

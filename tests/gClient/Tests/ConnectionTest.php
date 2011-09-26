@@ -11,6 +11,7 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase {
     public function setUp() {
         $class       = static::$_class;
         $this->_conn = new $class();
+        $this->_conn->setHTTPFactory(new Mock\HttpFactory);
     }
 
     protected static function getMethod($name) {
@@ -64,13 +65,6 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase {
 
         $method = $this->getMethod('getServiceClass');
         $method->invokeArgs($this->_conn, Array(new \DateTime('now'), true));
-    }
-
-    public function testVerifyPublicClientClassEnforced() {
-        $this->setExpectedException('\\RuntimeException');
-
-        $this->_conn->req_class = '\\StdClass';
-        $this->_conn->prepareCall('http://localhost');
     }
 
     public function testAuthenticateReturnsSelf() {
